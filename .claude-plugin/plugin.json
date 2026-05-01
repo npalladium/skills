@@ -1,0 +1,16 @@
+{
+  "name": "npalladium-skills",
+  "description": "Personal skills collection",
+  "skills": [
+    {
+      "name": "debug",
+      "description": "Structured debugging discipline for hard bugs",
+      "path": "skills/debug"
+    },
+    {
+      "name": "critique-writing",
+      "description": "Constructive, Socratic critique of writing",
+      "path": "skills/critique-writing"
+    }
+  ]
+}
