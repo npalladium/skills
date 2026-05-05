@@ -17,3 +17,8 @@ skills/
     references/       # Optional: supporting docs
     scripts/          # Optional: automation helpers
 ```
+
+## Credits
+
+- [obra/superpowers](https://github.com/obra/superpowers)
+- [mattpocock/skills](https://github.com/mattpocock/skills)
