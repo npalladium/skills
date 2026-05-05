@@ -75,7 +75,7 @@ Scale depth to input length. Prioritize impactful issues — don't pad with mino
 
 ## Reference
 
-See `references/style-guide.md` for the author's style preferences. Use it as context when critiquing — flag deviations, but the guide is loose, not law.
+Read the file `references/style-guide.md` located in this skill's directory for the author's style preferences. Use it as context when critiquing — flag deviations, but the guide is loose, not law.
 
 ## Constraints
 
