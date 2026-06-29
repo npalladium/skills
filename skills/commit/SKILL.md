@@ -66,3 +66,19 @@ Ran 50x parallel commit loop across two worktrees; no stale locks.
 ## Amending / rewriting history
 - Before `git commit --amend` or a rebase, run `git log -1` and confirm HEAD is the commit you mean to rewrite. HEAD can move underneath you — new commits may have landed since yours (e.g. the user committed meanwhile) — so a blind `--amend` folds your staged change into the wrong commit and rewrites it.
 - Only amend or force-push commits you authored and haven't shared.
+
+## Partial commits & history editing (non-interactive)
+No TTY/editor in an agent harness, so `git add -p`/`-i` and `git rebase -i` pickers don't run. Use deterministic equivalents:
+
+**Hunk-level staging:** build a patch and apply it to the index.
+- `git diff -- <path> > /tmp/p.diff`, trim to the hunks you want, then `git apply --cached /tmp/p.diff` and commit (`--reverse` unstages). File-level is just `git add <path>`.
+
+**Rewriting history — prefer primitives:**
+- Squash last N: `git reset --soft HEAD~N && git commit`.
+- Reword/extend HEAD: `git commit --amend`.
+- Fixup an older commit: `git commit --fixup=<sha>`, then `GIT_SEQUENCE_EDITOR=true git rebase --autosquash -i <sha>~1`.
+
+**When you need the todo list, script the editors:**
+- `GIT_SEQUENCE_EDITOR='sed -i …'` rewrites the pick-list (squash/fixup/drop/reorder); `GIT_EDITOR=cat`/`true` supplies or accepts messages; `git rebase --exec '<cmd>'` runs tests per commit.
+
+Rewriting pushed history needs `git pull --rebase --autostash` then a force-push — and re-check HEAD first (see Amending).
