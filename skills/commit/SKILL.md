@@ -8,6 +8,11 @@ metadata:
 
 # Committing
 
+## What to commit
+Atomic, self-contained, single-responsibility: one logical change per commit. Don't mix a refactor with a feature, or a fix with reformatting — if the subject needs an "and", it's probably two commits.
+- Each commit must build and pass tests **on its own**, so `git bisect` always lands on a meaningful commit and never a broken WIP. Don't defer a fix to "the next commit".
+- Split unrelated changes into separate commits; split a large change into a sequence of small, individually-tested ones.
+
 ## Before staging
 1. `git status --short` to inventory the tree.
 2. Run the repo's pre-commit hooks manually (lefthook / pre-commit / husky); fix failures before committing.
