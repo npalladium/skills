@@ -4,9 +4,9 @@
 
 Use when the user asks to document a codebase, package, or module.
 
-Two jobs, in order: **analyze** code using the vocabulary in `vocabulary.md`, then **document** the result using the same vocabulary. Use terms exactly — the vocabulary is the whole point.
+Two jobs, in order: **analyze** code using the vocabulary in `vocabulary.md`, then **document** the result using the same vocabulary. Use terms exactly—the vocabulary is the whole point.
 
-Focus on what's unlikely to change frequently — invariants, layer boundaries, and module relationships. These are invisible when reading code alone. Avoid documenting things derivable easily from the code itself. Target audience: someone who knows the problem domain but not this codebase. Begin with a bird's-eye problem overview, then a codemap showing how modules relate.
+Focus on what's unlikely to change frequently—invariants, layer boundaries, and module relationships. These are invisible when reading code alone. Avoid documenting things derivable easily from the code itself. Target audience: someone who knows the problem domain but not this codebase. Begin with a bird's-eye problem overview, then a codemap showing how modules relate.
 
 Document why unusual or surprising design choices exist (Chesterton's Fence). Without explicit rationale, future maintainers assume arbitrary choices and remove load-bearing structure.
 
@@ -56,7 +56,7 @@ Include whichever lenses are relevant to the system. Omit those that don't apply
 Use when the user asks to write an ADR for a decision.
 
 ```markdown
-# ADR-NNN: [Title — name the decision, not the outcome]
+# ADR-NNN: [Title—name the decision, not the outcome]
 
 ## Status
 [Proposed / Accepted / Superseded by ADR-MMM]
@@ -72,6 +72,26 @@ Use when the user asks to write an ADR for a decision.
 
 ## Alternatives considered
 [Each with one-two sentences grounded in principles: "Rejected: would have failed the deletion test."]
+```
+
+## Output: Design Doc
+
+Use when the user asks to design a system or feature *before* building it—distinct from the README (documents what exists) and the ADR (records one decision).
+
+Three layers, each a branch of possibilities; designing is choosing among them. Lay out the choices made, the notable ones rejected, and why.
+
+```markdown
+# [System / Feature Name]
+
+## Problem
+[Statement, goals, non-goals, and requirements—functional and non-functional.]
+
+## Functional specification
+[Precisely how the system behaves from the outside, independent of internals.]
+
+## Technical specification
+[The internals—modules, interfaces, seams, data model—in vocabulary terms.
+Cite principles for the non-obvious choices; note alternatives rejected.]
 ```
 
 ## Caveats

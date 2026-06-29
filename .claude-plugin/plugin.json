@@ -21,6 +21,11 @@
       "name": "commit",
       "description": "Safe commit/push workflow — staging discipline, message format, pre-commit/test gating, amend safety, non-interactive history editing",
       "path": "skills/commit"
+    },
+    {
+      "name": "code-design",
+      "description": "Concrete code-structuring tactics — naming, state/data modeling, control flow, coupling, abstraction, readability, defensiveness, project hygiene",
+      "path": "skills/code-design"
     }
   ]
 }
