@@ -16,6 +16,11 @@
       "name": "architect",
       "description": "Analyze, review, or document codebase architecture — design quality, module structure, abstractions, ADRs",
       "path": "skills/architect"
+    },
+    {
+      "name": "commit",
+      "description": "Safe commit/push workflow — staging discipline, message format, pre-commit/test gating, amend safety, non-interactive history editing",
+      "path": "skills/commit"
     }
   ]
 }
