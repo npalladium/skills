@@ -11,6 +11,11 @@
       "name": "critique-writing",
       "description": "Constructive, Socratic critique of writing",
       "path": "skills/critique-writing"
+    },
+    {
+      "name": "architect",
+      "description": "Analyze, review, or document codebase architecture — design quality, module structure, abstractions, ADRs",
+      "path": "skills/architect"
     }
   ]
 }
