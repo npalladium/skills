@@ -1,6 +1,6 @@
 # Checklists
 
-Review-only checklists for construction-level code, drawn from McConnell, _Code Complete_, 2nd ed. Use after implementation or while reviewing a diff, function, or method; select only relevant sections. `SKILL.md` guides design decisions; this file catches construction concerns before merging. Run the repository's formatter, linter, compiler, and static analysis first; these checklists cover concerns those tools cannot decide.
+Review-only checklists for construction-level code, primarily drawn from McConnell, _Code Complete_, 2nd ed., with additional checks for stateful operations. Use after implementation or while reviewing a diff, function, or method; select only relevant sections. `SKILL.md` guides design decisions; this file catches construction concerns before merging. Run the repository's formatter, linter, compiler, and static analysis first; these checklists cover concerns those tools cannot decide.
 
 | Change | Checklist |
 | --- | --- |
@@ -8,6 +8,7 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 | Branches or loops | Control flow; Loops |
 | Errors or input boundaries | Defensiveness |
 | Primitive data or variables | Primitive data types; General considerations in using data |
+| Mutable state, multi-step changes, or retries | Stateful operations |
 | Language or runtime semantics | Language-specific checks |
 
 ## Function extraction
@@ -81,6 +82,14 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 **Security:**
 - Does input-checking guard against buffer overflows, SQL injection, HTML injection, integer overflows, and the like?
 - Do error messages avoid revealing information that would help an attacker?
+
+## Stateful operations
+
+Use for code that owns mutable state, changes it in multiple steps, or may retry side effects.
+
+- When the same mutable fact exists in multiple places, is its authority defined within each consistency boundary, with every writer and synchronization path explicit?
+- For a multi-step state change, are the invariant and commit points explicit, and does failure after each commit leave valid or recoverable state?
+- If an operation may repeat after an unknown outcome, is automatic retry prohibited or made idempotent with a stable idempotency key and atomic deduplication whose record lasts for the full retry window?
 
 ## Primitive data types
 

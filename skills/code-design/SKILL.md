@@ -34,9 +34,9 @@ For reviewing existing code against construction-level checklists (function or m
 ### Build it early
 
 - **CI, automated deploys, test framework** from day one.
-- **Plan compatibility from day one for protocols/APIs/formats that are durable or independently evolving.** Version—or otherwise make compatible—serialized data that crosses a deployment boundary or outlives a process, especially at boundaries you don't control.
+- **Plan compatibility from day one for protocols/APIs/formats that cross deployment boundaries, evolve independently, or outlive a process.** Preserve meaning, defaults, ordering, failure behavior, and wire shape; version—or otherwise make compatible—persisted data and formats exchanged by independently deployed producers and consumers, especially at boundaries you don't control.
 - **Observability:** wide canonical logs, state-change logs, "critical" location logs at the minimum.
-- **Paginate every list endpoint from day one**—even if it currently returns one item—for consistent response shapes across endpoints and so future growth does not change the API.
+- **Paginate every list endpoint from day one**—even if it currently returns one item—for consistent response shapes and future growth without API changes. Use a deterministic total order and define how concurrent changes affect later pages, such as through cursor or snapshot semantics.
 
 ### Operability & bounds
 
@@ -82,6 +82,7 @@ Make module connections small, direct, visible, and flexible (easy to substitute
 - **Prefer pure functions, then small impure ones, then objects.** Maximize pure functions; next, small (1–4 param) functions that touch the outside world; only then domain objects wrapping them.
 - **Testability through seams, not ceremony.** Reserve DI for real I/O boundaries (clock, network, DB) where a fake swaps in; the pure core needs none.
   - **Mock only at the unmanaged edge.** Asserting on mock calls (communication-based testing) is the least-preferred style: reserve it for outgoing commands to unmanaged out-of-process dependencies (message bus, third-party API). Don't mock in-process collaborators—test them through observable behaviour.
+- **Do not orphan concurrent work.** Every spawned task is awaited, cancelled with its parent, or transferred to an explicit longer-lived owner.
 
 ### Abstraction
 
