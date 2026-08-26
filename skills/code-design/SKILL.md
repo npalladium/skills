@@ -14,6 +14,17 @@ For reviewing existing code against construction-level checklists (routines, con
 
 *Related: the `architect` skill for system/architecture-level design and design docs; the `commit` skill for staging, commit messages, and history hygiene.*
 
+## Navigation
+
+Work broad→narrow: project → module → state → function → naming → documentation. ⭐ marks the highest-leverage heuristics; jump to the scope of the decision.
+
+## Default workflow
+
+1. Define constraints and state invariants.
+2. Set module boundaries and isolate effects.
+3. Shape functions; then name and document the design.
+4. Review relevant construction concerns in `checklists.md`.
+
 ## Project-level tactics
 
 ### Hygiene

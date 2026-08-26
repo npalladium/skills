@@ -2,6 +2,15 @@
 
 Review checklists for construction-level code, drawn from McConnell, _Code Complete_, 2nd ed. Use them when reviewing a diff or routine—the tactics in `SKILL.md` say how to write code well; these say what to check before merging.
 
+Use after implementation or while reviewing a diff. Select only relevant sections: `SKILL.md` guides design decisions; this file catches construction concerns.
+
+| Change | Checklist |
+| --- | --- |
+| Extracting a routine | Valid reasons to create a routine |
+| Branches or loops | Control-structure issues; Loops |
+| Errors or input boundaries | Defensive programming |
+| Primitive data or variables | Fundamental data types; General considerations in using data |
+
 ## Valid reasons to create a routine
 
 *Source: ch. 7.* Use when deciding whether to extract code into its own routine, or verifying that an existing one earns its place. A routine should serve at least one of these:
