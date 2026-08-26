@@ -8,6 +8,7 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 | Branches or loops | Control flow; Loops |
 | Errors or input boundaries | Defensiveness |
 | Primitive data or variables | Primitive data types; General considerations in using data |
+| Language or runtime semantics | Language-specific checks |
 
 ## Function extraction
 
@@ -18,7 +19,6 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 - Avoid duplicate code.
 - Support subclassing—smaller overrides, less duplication.
 - Hide a sequence—the order in which events must be processed.
-- Hide pointer operations.
 - Improve portability—wrap nonportable operations.
 - Simplify a complicated boolean test behind a well-named function.
 - Improve performance—one place to tune, cache, or optimize.
@@ -35,12 +35,9 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 *Source: ch. 19.* For any function or method with non-trivial control flow.
 
 - Are boolean values tested implicitly, not compared explicitly to `true`/`false`?
-- Are numeric values compared to test values explicitly?
 - Are expressions simplified by adding new boolean variables, functions, or decision tables?
 - Are boolean expressions stated positively?
 - Are tests written in number-line order?
-- In languages with reference equality (e.g. Java), do tests use `a.equals(b)` rather than `a == b` where appropriate?
-- Are null statements made obvious?
 - Are nested statements simplified—by retesting, `if`/`else`, `case`, extracting a function or method, or polymorphism?
 - If a function or method's decision count exceeds ~10, is there a good reason not to redesign it?
 
@@ -52,16 +49,12 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 - Was the loop created from the inside out?
 - Is the loop entered only from the top?
 - Is initialization placed directly before the loop?
-- Is an infinite loop constructed cleanly (`while (true)`) rather than via `for i = 1 to 9999`?
-- Is the `for`-loop header reserved for loop-control code only?
 - Is housekeeping grouped at the start or end of the loop?
 - Does the loop perform only one function?
 - Is the loop short enough to view at once?
 - Is the loop nested no more than three levels deep?
 - Has a long loop body been extracted into a function or method?
 - Is a long loop especially clear?
-- Does the code refrain from monkeying with the `for`-loop index?
-- Are important loop-index values saved to a variable rather than read after the loop?
 - Is the loop index an ordinal or enum, never floating-point?
 - Does the loop index have a meaningful name?
 - Does the loop avoid index cross-talk between nested loops?
@@ -85,19 +78,8 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 - Is the amount of defensive code appropriate—neither too much nor too little?
 - Have offensive-programming techniques been used to make errors hard to overlook during development?
 
-**Exceptions:**
-- Has the project defined a standardized approach to exception handling?
-- Have alternatives to exceptions been considered?
-- Is the error handled locally rather than thrown nonlocally, where possible?
-- Does the code avoid throwing exceptions in constructors and destructors?
-- Are exceptions at the right level of abstraction for the functions or methods that throw them?
-- Does each exception carry the relevant background information?
-- Is the code free of empty catch blocks—or, where empty truly fits, is that documented?
-
 **Security:**
 - Does input-checking guard against buffer overflows, SQL injection, HTML injection, integer overflows, and the like?
-- Are all error-return codes checked?
-- Are all exceptions caught?
 - Do error messages avoid revealing information that would help an attacker?
 
 ## Primitive data types
@@ -126,7 +108,6 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 
 **Enums:**
 - Are enums used instead of named constants or booleans where they're richer?
-- Do tests check for invalid values, with the first entry reserved as invalid?
 
 **Constants:**
 - Are named constants used in data declarations and loop limits rather than literals, and used consistently—never mixed with bare literals?
@@ -138,7 +119,6 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 **Custom types:**
 - Is a custom type used for each kind of data that might change?
 - Are type names oriented to real-world entities rather than redefining predefined types?
-- Has a class been considered instead?
 
 ## General considerations in using data
 
@@ -151,7 +131,6 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 - Where declare-and-initialize isn't possible, are variables initialized close to first use?
 - Are counters and accumulators initialized properly and reset each time they're reused?
 - Are variables reinitialized properly in code that runs repeatedly?
-- If the language allows implicit declarations, have their hazards been compensated for?
 
 **Other usage:**
 - Do all variables have the smallest scope possible?
@@ -160,3 +139,35 @@ Review-only checklists for construction-level code, drawn from McConnell, _Code 
 - Are variables bound at appropriate times—balancing the flexibility of late binding against its complexity?
 - Does each variable have one and only one purpose?
 - Is each variable's meaning explicit, with no hidden meanings?
+
+## Language-specific checks
+
+Apply every matching group.
+
+### Exception-based languages (Java, Python, Ruby, C#, etc.)
+
+*Source: ch. 8.*
+
+- Are exceptions handled or translated where recovery or context is available?
+- Do exceptions match the API's abstraction and carry safe diagnostic context?
+- Are ignored exceptions explicitly justified?
+
+### Explicit result/error languages (C, Go, Rust, etc.)
+
+*Source: ch. 8.*
+
+- Is each error or result handled, propagated, or explicitly discarded?
+
+### Identity/value equality languages (Java, Python, JavaScript, etc.)
+
+*Source: ch. 19.*
+
+- Does each comparison use the intended identity or value semantics?
+
+### C-style imperative loop languages (C, C++, Java, C#, etc.)
+
+*Source: ch. 16.*
+
+- Are intentional infinite loops idiomatic rather than fake-bounded?
+- Does each `for` header contain only iteration control, without body mutation of its variable?
+- Are post-loop values captured explicitly rather than inferred from the final index?
