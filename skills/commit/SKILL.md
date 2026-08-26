@@ -9,21 +9,22 @@ metadata:
 # Committing
 
 ## What to commit
-Atomic, self-contained, single-responsibility: one logical change per commit. Don't mix a refactor with a feature, or a fix with reformatting — if the subject needs an "and", it's probably two commits.
-- Each commit must build and pass tests **on its own**, so `git bisect` always lands on a meaningful commit and never a broken WIP. Don't defer a fix to "the next commit".
-- Split unrelated changes into separate commits; split a large change into a sequence of small, individually-tested ones.
-- Once a logical change is verified and green, commit it atomically without waiting for another prompt.
+
+One logical change per commit; don't mix refactors, features, fixes, or reformatting. If the subject needs an "and", split it.
+
+- Each commit must build and pass tests independently; split large changes into green, bisectable steps.
+- Commit each verified logical change without waiting for another prompt.
 
 ## Before staging
-1. `git status --short` to inventory the tree.
-2. Run the repo's pre-commit hooks manually (lefthook / pre-commit / husky); fix failures before committing.
-3. After multi-file changes, run the full test suite. Only commit when green.
+
+1. Inventory the tree with `git status --short`.
+2. Run repository hooks and, after multi-file changes, the full suite. Commit only when green.
 
 ## Staging
-- Stage only files you edited this session, by explicit path: `git add path/a path/b`.
-- NEVER `git add -A` or `git add .`.
-- If something you didn't touch is already staged, surface it and ask before proceeding.
-- For a partial commit, verify that omitted changes are not required for the staged code to build or pass applicable checks. Unrelated scratch files (notes, data, scripts, etc.) may remain untouched; do not inspect or stage them merely because they exist.
+
+- Stage only files edited this session, using explicit paths—never `git add -A` or `git add .`.
+- Surface unrelated staged changes before proceeding.
+- For partial commits, ensure omitted changes aren't needed to build or test. Leave unrelated scratch files untouched and uninspected.
 
 ## Message format
 Follow any commit convention provided by repository instructions already in context. Otherwise use this convention: an imperative subject of at most 50 characters with no trailing period. Lead with one verb:
@@ -72,25 +73,23 @@ Ran 50x parallel commit loop across two worktrees; no stale locks.
 ```
 
 ## Pushing
-- After each green atomic commit, push `HEAD` to the current branch's configured upstream. If no upstream exists, surface the intended remote and branch instead of guessing.
-- If an ordinary push is rejected, inspect the divergence; never force-push merely as a fallback.
-- Before a confirmed force-push, record the branch, local HEAD, and remote tip; run `git pull --rebase --autostash`, recheck the rewritten range and applicable checks, then push with `--force-with-lease`. If the lease fails, stop and reassess—never retry with `--force`.
+
+- Push each green commit to its configured upstream; if none exists, surface the intended target.
+- If rejected, inspect the divergence—never force-push as a fallback.
+- Before a confirmed force-push, record the branch, local HEAD, and remote tip; run `git pull --rebase --autostash`, recheck, then use `--force-with-lease`. If the lease fails, stop—never use `--force`.
 
 ## Amending / rewriting history
-- Immediately before an amend or rebase, run `git log -1` and verify that HEAD and the intended range have not moved.
-- Amend automatically only when HEAD is the exact commit created for the current logical change and no later commit exists. Otherwise create a new atomic commit unless a specific rewrite was requested.
-- For pushed rewrites, follow the force-push procedure above.
+
+- Before amending or rebasing, verify that HEAD and the intended range haven't moved.
+- Amend automatically only when HEAD is the unchanged commit just created; otherwise commit anew unless a rewrite was requested.
+- Pushed rewrites follow the force-push procedure above.
 
 ## Partial commits & history editing
-Use interactive pickers or editors when the harness can drive and verify them reliably; otherwise use deterministic equivalents:
 
-**Hunk-level staging:** build a patch and apply it to the index.
-- `git diff -- <path> > /tmp/p.diff`, trim to the hunks you want, then `git apply --cached /tmp/p.diff` and commit (`--reverse` unstages). File-level is just `git add <path>`.
+Use interactive tools when reliable; otherwise use deterministic equivalents:
 
-**Rewriting history — prefer primitives:**
-- Squash last N: `git reset --soft HEAD~N && git commit`.
-- Reword/extend HEAD: `git commit --amend`.
-- Fixup an older commit: `git commit --fixup=<sha>`, then `GIT_SEQUENCE_EDITOR=true git rebase --autosquash -i <sha>~1`.
-
-**When you need the todo list, script the editors:**
-- `GIT_SEQUENCE_EDITOR='sed -i …'` rewrites the pick-list (squash/fixup/drop/reorder); `GIT_EDITOR=cat`/`true` supplies or accepts messages; `git rebase --exec '<cmd>'` runs tests per commit.
+- Stage selected hunks by trimming a `git diff` patch and applying it with `git apply --cached`; use `--reverse` to unstage.
+- Squash the last N commits with `git reset --soft HEAD~N && git commit`.
+- Reword or extend HEAD with `git commit --amend`.
+- Fix up an older commit with `git commit --fixup=<sha>` followed by an autosquash rebase.
+- Script rebase editors when necessary; use `git rebase --exec '<cmd>'` to run checks per commit.
