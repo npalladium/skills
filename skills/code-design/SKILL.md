@@ -34,18 +34,18 @@ For reviewing existing code against construction-level checklists (function or m
 ### Build it early
 
 - **CI, automated deploys, test framework** from day one.
-- **Versioning** in protocols/APIs/formats (esp. boundaries you don't control).
+- **Plan compatibility from day one for protocols/APIs/formats that are durable or independently evolving.** Version—or otherwise make compatible—serialized data that crosses a deployment boundary or outlives a process, especially at boundaries you don't control.
 - **Observability:** wide canonical logs, state-change logs, "critical" location logs at the minimum.
-- **Pagination** on every list endpoint (even single-result ones).
+- **Paginate every list endpoint from day one**—even if it currently returns one item—for consistent response shapes across endpoints and so future growth does not change the API.
 
 ### Operability & bounds
 
 - **Debuggable systems.**
-  - Every error carries context (operation, inputs, result) + a referenceable id to logs/docs.
+  - Every error carries safe context (operation, relevant state) and a reference ID; exclude sensitive data (credentials, PII, regulated data, etc.).
   - Ship toggleable production diagnostics, not dev-only logging.
   - Make test failures diagnosable without a rerun.
   - Write error messages for the reader—minimize cognitive load and provide context: show an example, a likely fix, or a hint, not just what failed.
-- **Bound everything.** `LIMIT` queries; cap updates/deletes/queues; rate-limit actions; aggressive client timeouts; circuit-breakers/bulkheads for graceful downstream failure; retention policy on data.
+- **Bound everything.** Anything that can grow, wait, or consume resources needs a deliberate limit. Examples: `LIMIT` queries; cap updates/deletes/queues; rate-limit actions. For wire data, bound bytes or cardinality and provide pagination, streaming, or chunking when valid data can exceed the limit. Isolate downstream failure with timeouts, circuit breakers, and bulkheads.
 
 ## Module-level tactics
 
@@ -82,8 +82,6 @@ Make module connections small, direct, visible, and flexible (easy to substitute
 - **Prefer pure functions, then small impure ones, then objects.** Maximize pure functions; next, small (1–4 param) functions that touch the outside world; only then domain objects wrapping them.
 - **Testability through seams, not ceremony.** Reserve DI for real I/O boundaries (clock, network, DB) where a fake swaps in; the pure core needs none.
   - **Mock only at the unmanaged edge.** Asserting on mock calls (communication-based testing) is the least-preferred style: reserve it for outgoing commands to unmanaged out-of-process dependencies (message bus, third-party API). Don't mock in-process collaborators—test them through observable behaviour.
-- **Version all serialized data.** Data that touches the wire or disk must be versioned.
-- **Bound all on the wire data.** There should be explicit size bounds defined for on the wire data, either in terms of bytes or project specific units or both. Once data is bound, provide APIs for chunking or pagination; at the least ensure your design doesn't preclude them.
 
 ### Abstraction
 
@@ -101,7 +99,7 @@ Make module connections small, direct, visible, and flexible (easy to substitute
 - **Multi-status entities → explicit state machine.** Enumerate states *and* legal transitions so illegal moves can't be invoked—MISU for the moves, not just the states. The transition table is the spec.
 - **That boolean is probably something else.** Flips once on an event → store the timestamp (`deleted_at`, not `deleted`: keep *when*, not just *whether*); mutually-exclusive flags → one status enum; bare booleans only for short-lived local predicates, not persisted data.
 - **Avoid boolean blindness.** A bare `bool` loses which proposition was true—prefer named enums/variants.
-- **Zero-one-infinity.** In the data model, reject "exactly one"—allow none or unbounded many, no arbitrary caps; one→two means jump to arbitrary-many. Limits belong in the implementation, not the abstraction—model open-endedly, run with bounds.
+- **Zero-one-infinity.** Avoid arbitrary small maxima; preserve exactly-one domain invariants and otherwise model zero or many, with operational bounds.
 - **Prefer meaningless IDs.** Synthetic opaque keys over fact-encoding IDs—encoded meaning eventually lies. Keep mutable attributes as separate fields; never overload the identifier.
 - **Decide symmetry on purpose.** For same-typed relations, ask if `F(x,y) ⇒ F(y,x)`. Symmetric many-to-many → join table, not array fields (silent violations). Antisymmetric predicates (invites) are fragile—enumerate simultaneous/duplicate/merge cases up front.
 - **Prefer immutability.** `const`/`final`/frozen for values stable after construction; shared mutable state changes under other callers. Limit mutability to where you need it.
@@ -125,8 +123,8 @@ Control flow is a tree of possible states; each condition prunes branches—prun
   - **Branching:** turn a hardcoded `if`/`switch` cascade into a lookup table / transition map the code interprets—easier to extend, audit, test; pairs with the state-machine table.
 - **Anti-if patterns:**
   - **Boolean params** (`create(true, false)` is opaque at the call site) → two named methods, or a named enum/variant.
-  - **Type-switches** → polymorphism; new types *must* implement the branch.
-  - **Nulls** → design out: empty collection / `Optional` / Null Object.
+  - **Type switches:** use exhaustive matching for closed variants; use polymorphism or dispatch for open ones.
+  - **Model absence explicitly.** Translate external nulls at boundaries; use `Option`/`Optional`, empty collections, or domain results only when their meanings fit.
 - **Push *decision* ifs up; *data-validation* ifs down.** They only seem to conflict:
   - **Decision branches** ("which thing to do") → hoist to the caller: control flow in one place, dead branches exposed, inner functions do one unconditional thing.
   - **Data/error branches** (null/parse/status-code) → push down to where data enters, so callers don't re-implement checks.
@@ -146,7 +144,7 @@ Reliable software has three separately-improvable parts: the functionality, asse
 
 - **Scale defensiveness to context.** Internal, testable code → minimal guards; critical systems / untrusted data / hard-to-patch deploys → heavy boundary validation. Complements, never replaces, tests.
 - **Never silently swallow anomalies.** Surface unexpected conditions to monitoring; choose the failure mode (nil / default / correct) deliberately and consistently.
-- **Fail loud in dev, degrade in prod.** In dev make errors impossible to ignore (asserts abort, `default`/`else` fail hard) so bugs get fixed; degrade gracefully in prod.
+- **Make failures visible; choose production behavior by risk.** Fail fast in development. In production, degrade only when correctness and security remain intact; otherwise fail closed and surface the error.
 - **Guarantee cleanup (RAII/`defer`/try-finally).** Bind release to scope exit, not manual close on every path—an early return, exception, or new branch can't skip it.
 
 ## Naming tactics
