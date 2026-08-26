@@ -23,6 +23,8 @@ Always load `vocabulary.md` first. Every architectural claim must use these term
 | Document | `documentation.md` | Architecture README, ADR, or Design Doc (templates in documentation.md) |
 | Decide | `design.md` | Recommendation grounded in named principles |
 
+In any mode, consult `checklists.md` for calibration and review aids: detail level per requirement, diagram selection, vision-and-scope sections, a pre-construction architecture review, and a class/module design review.
+
 A Design Doc is forward-looking—design before building; the README and ADR cover existing structure.
 
 # Constraints (all modes)

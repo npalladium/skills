@@ -10,6 +10,8 @@ metadata:
 
 Lookup-style tactics, ordered broad→narrow: project → module → state → function → naming, plus documentation. Apply with judgment, not dogma.
 
+For reviewing existing code against construction-level checklists (routines, control flow, loops, defensive programming, data usage), see `checklists.md`.
+
 *Related: the `architect` skill for system/architecture-level design and design docs; the `commit` skill for staging, commit messages, and history hygiene.*
 
 ## Project-level tactics
@@ -73,6 +75,8 @@ Make module connections small, direct, visible, and flexible (easy to substitute
 - **Prefer pure functions, then small impure ones, then objects.** Maximize pure functions; next, small (1–4 param) functions that touch the outside world; only then domain objects wrapping them.
 - **Testability through seams, not ceremony.** Reserve DI for real I/O boundaries (clock, network, DB) where a fake swaps in; the pure core needs none.
   - **Mock only at the unmanaged edge.** Asserting on mock calls (communication-based testing) is the least-preferred style: reserve it for outgoing commands to unmanaged out-of-process dependencies (message bus, third-party API). Don't mock in-process collaborators—test them through observable behaviour.
+- **Version all serialized data.** Data that touches the wire or disk must be versioned.
+- **Bound all on the wire data.** There should be explicit size bounds defined for on the wire data, either in terms of bytes or project specific units or both. Once data is bound, provide APIs for chunking or pagination; at the least ensure your design doesn't preclude them.
 
 ### Abstraction
 

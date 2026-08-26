@@ -12,6 +12,8 @@ Each phase gates the next — **do not proceed** until the current phase is comp
 
 **Iron law:** NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.
 
+When a phase stalls—no hypotheses in Phase 4, a fix that won't hold in Phase 6—see `checklists.md` for McConnell's debugging reminders (finding the defect, fixing it, general approach).
+
 ## Phase 1 — Build a feedback loop
 
 **This is the skill.** A fast, deterministic, agent-runnable pass/fail signal for the bug is everything. Without one, nothing else works. Spend disproportionate effort here.
