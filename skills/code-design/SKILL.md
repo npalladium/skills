@@ -8,15 +8,11 @@ metadata:
 
 # Code Design
 
-Lookup-style tactics, ordered broad→narrow: project → module → state → function → naming, plus documentation. Apply with judgment, not dogma.
+Lookup-style tactics, ordered broad→narrow: project → module → state → function → naming → documentation. Jump to the scope of the decision; ⭐ marks the highest-leverage heuristics. Apply with judgment, not dogma.
 
-For reviewing existing code against construction-level checklists (routines, control flow, loops, defensive programming, data usage), see `checklists.md`.
+For reviewing existing code against construction-level checklists (function or method extraction, control flow, loops, defensiveness, primitive data types, variable use), see `checklists.md`.
 
 *Related: the `architect` skill for system/architecture-level design and design docs; the `commit` skill for staging, commit messages, and history hygiene.*
-
-## Navigation
-
-Work broad→narrow: project → module → state → function → naming → documentation. ⭐ marks the highest-leverage heuristics; jump to the scope of the decision.
 
 ## Default workflow
 
