@@ -25,7 +25,7 @@ For reviewing existing code against construction-level checklists (function or m
 
 ### Hygiene
 
-- ⭐ **Always-green main:** a fixed check set that always passes; zero flaky tests (delete ones you can't trust).
+- ⭐ **Always-green main:** keep a fixed check set trustworthy. Diagnose flakiness; fix nondeterministic tests, quarantine only with an owner and exit condition, and delete only obsolete or reliably replaced coverage.
 - ⭐ **Make every rule deterministic.** Express rules as automated checks—tests, linters, architecture/dependency tests (fitness functions)—not prose. If your taste can be a test, make it one.
 - **Split tests fast vs slow:** seconds (local+CI) vs minutes (CI only); run benchmarks as tests so they don't rot.
 - **One-command reproducible build**, few entry points (a lint is a test).
@@ -53,12 +53,7 @@ For reviewing existing code against construction-level checklists (function or m
 
 Make module connections small, direct, visible, and flexible (easy to substitute).
 
-- ⭐ **Coupling severity ladder** (worst→best). Slide each call site down toward Message; fewer args = looser coupling, and pass only the fields needed, not a whole object. Kill control coupling with intent-named methods (`save`/`save_without_validations`, not `save(false)`).
-  - **Pathological**—reach into another module's internals / monkey-patch.
-  - **Global**—shared mutable singleton.
-  - **Control**—a flag drives the callee's branching.
-  - **Data**—params, no control flow.
-  - **Message**—no args; relies only on the interface name.
+- ⭐ **Make dependencies explicit and narrow.** Prefer cohesive inputs that expose only the required contract. Judge coupling by knowledge of another module's representation, reliance on mutable ambient state, and required coordination—not argument count. A no-argument call is not loosely coupled when it relies on hidden object or global state. Kill control coupling with intent-named methods (`save`/`save_without_validations`, not `save(false)`).
 - **Trade strong coupling for connascence-of-name.** Swapping shared execution-order / value / algorithm coupling for agreement on a name (magic value → named constant, positional → named args) wins; also cut how many parts change together, and keep them close.
 - **Locality of Behaviour.** Understand a unit by reading it alone: keep related code close, surface call sites, hide only implementation. Avoid action-at-a-distance; trades against DRY/SoC—cross-file violations hurt most.
   - **No train-wreck chains** (`a.getX().getY().doZ()`)—they couple the caller to a navigation path.
@@ -95,7 +90,7 @@ Make module connections small, direct, visible, and flexible (easy to substitute
 
 - ⭐ **Make illegal states unrepresentable (MISU).** N booleans = 2^N states, few legal—use an enum/tagged union so only valid states compile (and extend cleanly). The general move: push correctness into types so the compiler rejects bad states, not runtime checks—
   - **Domain types over primitives.** `Money`/`EmailAddress`, not `double`/`string`—a validated type can't hold garbage; "stringly-typed" fields scatter validation. (Skip universal primitives: counts, indices.)
-  - ⭐ **Parse, don't validate.** Convert untrusted input to trusted *typed* values once at the boundary; the core never re-checks. Prefer total functions + explicit errors over partial functions + exceptions.
+  - ⭐ **Parse, don't validate.** Convert untrusted input to trusted *typed* values once at the boundary; the core never re-checks stable value invariants. Predicates over mutable state must be checked at the authoritative action or commit boundary. Prefer total functions + explicit errors over partial functions + exceptions.
   - **Programmatic, not semantic, interfaces.** What the compiler can't enforce gets misused—encode assumptions ("array must be sorted", "call within a transaction") as types/asserts/builders, not comments.
 - **Multi-status entities → explicit state machine.** Enumerate states *and* legal transitions so illegal moves can't be invoked—MISU for the moves, not just the states. The transition table is the spec.
 - **That boolean is probably something else.** Flips once on an event → store the timestamp (`deleted_at`, not `deleted`: keep *when*, not just *whether*); mutually-exclusive flags → one status enum; bare booleans only for short-lived local predicates, not persisted data.
@@ -119,7 +114,7 @@ Control flow is a tree of possible states; each condition prunes branches—prun
   - **Commit & respond.**
 - ⭐ **Guard clauses for special cases; `else` for core branches.** Bail early on exceptional/short cases to de-indent the main path (each dropped `else` removes a nesting level); keep `else` when both arms are core responsibility—don't scatter related conditional logic.
 - ⭐ **Command-Query Separation.** A function returns a value *or* changes state, not both—unless the dual role *is* the contract, then name it so (`get_or_create`, `ensure_*`).
-- **`if/else if` with no final `else`** silently falls through on a new case—add an explicit final `else`/`default`/assert.
+- **Handle unmatched cases deliberately.** For closed variants, prefer compiler-checked exhaustive matching and avoid catch-all branches that hide newly added cases. For open inputs, define unknown-case behavior explicitly. Make intentional no-op fallthrough clear.
 - **Prefer declarative over imperative.** For parts that are simple facts with no sequence or conditionals, state them declaratively.
   - **Branching:** turn a hardcoded `if`/`switch` cascade into a lookup table / transition map the code interprets—easier to extend, audit, test; pairs with the state-machine table.
 - **Anti-if patterns:**

@@ -104,10 +104,6 @@ Use for code that owns mutable state, changes it in multiple steps, or may retry
 **Integers:**
 - Does integer division behave as intended, and is overflow avoided?
 
-**Floating point:**
-- Does it avoid mixing values of very different magnitudes?
-- Are rounding errors handled systematically?
-- Does it avoid equality comparison (`==`) on floats?
 
 **Strings:**
 - Does it avoid magic strings and characters, and is it free of off-by-one errors?
