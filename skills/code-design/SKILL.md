@@ -25,10 +25,11 @@ For reviewing existing code against construction-level checklists (function or m
 
 ### Hygiene
 
+- **Follow established conventions.** Prefer the applicable project, language, framework, organization, and team conventions over introducing a second local pattern; diverge only for a concrete correctness or maintainability reason.
 - ⭐ **Always-green main:** keep a fixed check set trustworthy. Diagnose flakiness; fix nondeterministic tests, quarantine only with an owner and exit condition, and delete only obsolete or reliably replaced coverage.
 - ⭐ **Make every rule deterministic.** Express rules as automated checks—tests, linters, architecture/dependency tests (fitness functions)—not prose. If your taste can be a test, make it one.
 - **Split tests fast vs slow:** seconds (local+CI) vs minutes (CI only); run benchmarks as tests so they don't rot.
-- **One-command reproducible build**, few entry points (a lint is a test).
+- **One-command reproducible setup and one-command reproducible build**, with few entry points (a lint is a test).
 - **What you can't automate, codify** into a style guide.
 
 ### Build it early
