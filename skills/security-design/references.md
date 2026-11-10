@@ -1,6 +1,6 @@
 # Security Design References
 
-Sources for the security skill and related compatibility/scout design. Local guidance is a synthesis, not wholesale adoption of any source's rules.
+Sources for security design and compatibility review. Local guidance is a synthesis, not wholesale adoption of any source's rules.
 
 ## Primary foundations
 
@@ -22,13 +22,8 @@ Sources for the security skill and related compatibility/scout design. Local gui
 - [Threat Modeling Manifesto](https://www.threatmodelingmanifesto.org/)—iterative, fit-for-purpose analysis and useful outcomes rather than a mandatory notation or methodology.
 - [Plumatic: A Few Testing Principles](https://github.com/plumatic/eng-practices/blob/master/clojure/20130821-testing-principles.md)—earlier influence on regression protection, refactoring confidence, and testing at meaningful boundaries; not a requirement to test trivial forwarding or adopt its mocking examples.
 
-## Review and scout influences
+## Review influences
 
-PostHog and Ryan Prior's Nyquist article inspire **all seven scout skills**. Their combination motivates the local aim: reconstruct, validate, and maintain understanding closer to the rate of software change, without proportional human attention.
-
-- [PostHog: What is a Scout?](https://posthog.com/blog/what-is-a-scout) and [What's in a scout](https://posthog.com/docs/self-driving/whats-in-a-scout)—skill plus thin harness, disqualifiers, stable deduplication, restrained signals, and durable scratchpads. The stateless/stateful separation here is a local design; analytics noise thresholds are not security-finding thresholds.
-- [Cisco Foundry Constitution](https://github.com/CiscoDevNet/foundry-security-spec/blob/main/constitution.md), I, II, VII–X—evidence, triage, impact, stable identities, runtime isolation, and operator authority. Its fleet, queue, provider-rate, and autonomous-work policies are not adopted.
 - [Trail of Bits: Your AI agent fixed the bug, but what else did it change?](https://blog.trailofbits.com/2026/10/21/your-ai-agent-fixed-the-bug-but-what-else-did-it-change/)—concise opinionated guidance, invariant-guided repair, regression checks, and independent replay. The [skills repository](https://github.com/trailofbits/skills), including [Differential Review](https://github.com/trailofbits/skills/tree/main/plugins/differential-review), informed change-path review. This skill does not require their schemas or discard static findings for lack of a live proof.
-- [Ryan Prior: Nyquist Limit](https://www.ryanprior.com/posts/nyquist-limit-frequency-of-changes-in-tech-invalidates-understanding/)—the warning that software change can outrun understanding; motivates reconstructing and revalidating knowledge rather than relying on stale interpretations. Used as inspiration, not a mathematical sampling law or fixed review cadence.
 
-The six scout lenses, compatibility dimensions and attributes, and context/intent/loop/goal distinctions are local synthesis from the requested design, not taxonomies prescribed by these sources.
+The compatibility dimensions and attributes are local synthesis, not a taxonomy prescribed by these sources.

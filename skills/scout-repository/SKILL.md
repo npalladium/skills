@@ -23,7 +23,7 @@ Read [`vocabulary.md`](vocabulary.md) for evidence and memory terms and the rele
 | [`scout-integration-test-adequacy`](../scout-integration-test-adequacy/SKILL.md) | Whether tests distinguish correct behavior from plausible cross-component failures. |
 | [`scout-architectural-entropy`](../scout-architectural-entropy/SKILL.md) | Competing mechanisms, unintended coupling, abandoned paths, and consequential exceptions. |
 
-Use [`security-design`](../security-design/SKILL.md) to reason about protection guarantees and [`compatibility-review`](../compatibility-review/SKILL.md) for evolving consumer obligations. Those skills own their specialist vocabulary; this skill owns scout operation. Keep companion skill files available together. If a required companion is unavailable, report the missing dependency rather than silently substituting a different procedure. No automated dependency loader is assumed.
+Use [`security-design`](../security-design/SKILL.md) to reason about protection guarantees and [`compatibility-review`](../compatibility-review/SKILL.md) for evolving consumer obligations. Those skills own domain reasoning and remain independent of scout operation; this skill owns permissions, memory, and signal reporting. Keep companion skill files available together. If a required companion is unavailable, report the missing dependency rather than silently substituting a different procedure. No automated dependency loader is assumed.
 
 ## Run brief
 
@@ -79,7 +79,7 @@ Use plain Markdown or the caller's structured format with these meanings. Omit i
 - **Scenario and consequence:** the concrete violating case, affected principal/resource/consumer, prerequisites and reach; or the specific unresolved decision for a question/gap. Separate severity from confidence.
 - **Counterevidence and disposition:** controls or alternative explanations considered, why the concern survives, and the smallest sound remediation, next verification, or owner decision.
 
-For security and compatibility signals, add the relevant specialist fields from their skills. Check evidence locators resolve before delivery. An unsupported severity multiplier, speculative downstream chain, or missing-looking check does not become evidence through confident wording.
+Adapt security and compatibility findings to this signal contract while retaining their specialist fields. Check evidence locators resolve before delivery. An unsupported severity multiplier, speculative downstream chain, or missing-looking check does not become evidence through confident wording.
 
 Close with **completed, partial, or blocked** scope; what was inspected; material exclusions; verification actually performed; useful signals; and important limitations. Do not dump every discarded lead or manufacture recommendations to fill an empty report.
 
@@ -88,4 +88,6 @@ Close with **completed, partial, or blocked** scope; what was inspected; materia
 Within a run, group manifestations of the same underlying concern without merging different guarantees or causes. Across runs, a stateful scout or a separate post-discovery stage compares stable identities and evidence. Re-emit only for a material change—new impact, expanded scope, fresh counterevidence, regression, expired exception, or an agreed escalation trigger. Attach the change to the prior record rather than presenting it as a new discovery. A moved symbol may need identity reconciliation, not a new finding.
 
 Propose memory updates with source, scope, date/snapshot, status, owner/acceptance where applicable, and a revalidation or reopening condition. A designated curator reviews and accepts them; the scout does not grant itself write permission. Keep hypotheses, accepted decisions, exceptions, debt, verified fixes, and disproved concerns distinct. Repeated agent assertions never become policy. Preserve provenance and minimize sensitive content.
+
+Source attribution: [references.md](references.md) (load only when sources or provenance matter).
 

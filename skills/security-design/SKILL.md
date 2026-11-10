@@ -20,7 +20,7 @@ Reason from guarantees and complete authority paths, not feature names or checkl
 
 Use [checklists.md](checklists.md) for implementation and review questions, [vocabulary.md](vocabulary.md) for disputed terms, and [worked examples](references/examples.md) for calibration.
 
-Use [`compatibility-review`](../compatibility-review/SKILL.md) for consumer obligations and [`scout-repository`](../scout-repository/SKILL.md) for scout operation, memory, and reporting. [`scout-authorization-invariants`](../scout-authorization-invariants/SKILL.md) is the focused authorization scout; `code-design` covers construction tactics and `architect` broader design. Load companions only when applicable; report missing required guidance rather than inventing it.
+Use [`compatibility-review`](../compatibility-review/SKILL.md) for consumer obligations; `code-design` covers construction tactics and `architect` broader design. Load companions only when applicable; report missing required guidance rather than inventing it.
 
 ## Design principles
 
@@ -75,7 +75,7 @@ Protective defaults should not depend on operators discovering an unsafe initial
 3. **Inspect boundaries and state.** Apply the relevant checklist questions to exact caller/action/target authorization, derived-data permissions, and state transitions. Types do not eliminate mutable-state or authorization races.
 4. **Challenge failure semantics.** Examine failure, concurrency, and recovery across transaction and external-effect boundaries. A lost response does not establish that nothing happened; compensation is not necessarily rollback.
 5. **Try to falsify the concern.** Seek checks elsewhere, valid delegation, and safe sibling paths. Establish a real affected path and concrete violating scenario before calling a suspicious pattern a defect. For a confirmed defect, identify the shared failure mechanism and check affected sibling paths; distinguish verified instances from untested candidates.
-6. **Verify at the enforcing boundary.** Use isolated scenarios that distinguish correct behavior from plausible failure, covering relevant allow/deny and lifecycle cases. Check the whole relevant test module after a change. Use harmless fixtures; production or third-party probes require explicit authorization. Obey the scout run brief; when execution is unavailable or unauthorized, report static support and verification limits.
+6. **Verify at the enforcing boundary.** Use isolated scenarios that distinguish correct behavior from plausible failure, covering relevant allow/deny and lifecycle cases. Check the whole relevant test module after a change. Use harmless fixtures; production or third-party probes require explicit authorization. When execution is unavailable or unauthorized, report static support and verification limits.
 7. **Review and report.** Apply the [review checklist](checklists.md#d-during-review) and [reporting fields](#report-significant-findings).
 
 ## Calibrate security claims
@@ -92,7 +92,7 @@ Protective defaults should not depend on operators discovering an unsafe initial
 
 For each significant finding, provide:
 
-1. **Claim and evidence level:** a substantiated defect, supported design concern, or unresolved question; state whether support is static, runtime, or mixed. In scout mode use the shared signal kinds from `scout-repository`.
+1. **Claim and evidence level:** a substantiated defect, supported design concern, or unresolved question; state whether support is static, runtime, or mixed.
 2. **Invariant or contract:** what should hold, its scope and authority source. If the concern also changes a consumer expectation, use `compatibility-review` for its independent classification.
 3. **Affected path:** entry point, caller identity, relevant boundary/enforcement point, dependency or state transition, and affected resource/consumer.
 4. **Evidence:** file/line or other locator, test or runtime evidence, counterevidence, assumptions, and what remains unverified.

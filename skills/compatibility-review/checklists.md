@@ -1,6 +1,6 @@
 # Compatibility Checklists
 
-Use with [the workflow](SKILL.md) and [exact taxonomy](vocabulary.md). Select only relevant questions; these are prompts, not universal support promises. Scout execution and reporting remain governed by the required `scout-repository` companion files.
+Use with [the workflow](SKILL.md) and [exact taxonomy](vocabulary.md). Select only relevant questions; these are prompts, not universal support promises.
 
 ## Before implementation or review
 
@@ -50,4 +50,4 @@ Choose version pairings from actual support policy. For each test specify the co
 - Choose preservation, caller migration, negotiation/versioning, staged migration, deprecation, or an accepted break based on actual support policy and evidence. Do not add compatibility layers for hypothetical consumers.
 - When mixed-version support is required, define rollout order, compatible intermediate states, old-artifact handling, and rollback/forward-recovery boundaries before contracting old representations.
 - For authorized implementation, update affected callers, generated interfaces, focused behavioral tests, contracts, and deployment/migration instructions together. Do not weaken tests to make a changed contract appear compatible.
-- In review/scout mode, report the narrow decision or remediation; do not automatically apply it. Keep security obligations intact even when a consumer depends on defective behavior.
+- In review-only tasks, report the narrow decision or remediation; do not automatically apply it. Keep security obligations intact even when a consumer depends on defective behavior.

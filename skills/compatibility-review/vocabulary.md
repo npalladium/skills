@@ -6,7 +6,13 @@ These are working review labels, not an externally mandated standard. Describe *
 
 Compatibility asks whether supported consumers can continue relying on the system as it evolves. Consumers include stored data, jobs, events, integrations, operators, and independently deployed clients. A corrective change can still break them.
 
-For the distinction between correctness across behavior, coherence across space, and compatibility across time, see [`scout-repository/vocabulary.md`](../scout-repository/vocabulary.md). This file owns the change dimensions and obligation attributes below.
+| Concern | Question | Do not confuse it with |
+| --- | --- | --- |
+| Correctness across behavior | Does the implementation do what it is supposed to do? | Repeating the implementation in a test or treating existing behavior as intended. |
+| Coherence across space | Do independently developed parts agree on shared concepts, conventions, and invariants? | Uniformity for its own sake; different domains may need different meanings or mechanisms. |
+| Compatibility across time | Can existing consumers continue relying on the system as it evolves? | Correctness alone; a corrective fix may still break consumers. |
+
+A system can be coherently wrong. A change can improve correctness and break compatibility. A current inconsistency is not proof that architecture is deteriorating over time. Keep these claims separate.
 
 ## Dimensions: what changed?
 

@@ -1,16 +1,6 @@
 # Scout Vocabulary
 
-These terms define [the shared operating contract](SKILL.md). Specialist security concepts belong in [`security-design/vocabulary.md`](../security-design/vocabulary.md); compatibility dimensions and attributes belong in [`compatibility-review/vocabulary.md`](../compatibility-review/vocabulary.md).
-
-## Three distinct questions
-
-| Concern | Question | Do not confuse it with |
-| --- | --- | --- |
-| Correctness across behavior | Does the implementation do what it is supposed to do? | Repeating the implementation in a test or treating existing behavior as intended. |
-| Coherence across space | Do independently developed parts agree on shared concepts, conventions, and invariants? | Uniformity for its own sake; different domains may need different meanings or mechanisms. |
-| Compatibility across time | Can existing consumers continue relying on the system as it evolves? | Correctness alone; a corrective fix may still break consumers. |
-
-A system can be coherently wrong. A change can improve correctness and break compatibility. A current inconsistency is not proof that architecture is deteriorating over time. Keep these claims separate.
+These terms define [the shared operating contract](SKILL.md). Specialist security concepts belong in [`security-design/vocabulary.md`](../security-design/vocabulary.md); correctness/coherence/compatibility distinctions and change attributes belong in [`compatibility-review/vocabulary.md`](../compatibility-review/vocabulary.md#independent-questions).
 
 ## Evidence and claims
 

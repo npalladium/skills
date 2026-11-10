@@ -133,3 +133,5 @@ skills/
 ## References
 
 See [references.md](references.md) for repository-wide inspirations.
+
+For scout-specific sources and inspirations, see [scout references](skills/scout-repository/references.md).

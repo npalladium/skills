@@ -15,4 +15,4 @@ Use these distinctions to make claims precise. Project-specific meanings take pr
 | Authoritative source / resource owner | The authoritative source establishes a fact; the resource owner is the principal or domain entitled to control the resource. They need not be the same entity. |
 | Trusted / trustworthy | A component is trusted when the guarantee relies on it; it is trustworthy to the extent evidence justifies that reliance for the stated purpose. |
 
-For shared evidence and analysis terms, see [scout vocabulary](../scout-repository/vocabulary.md); for consumer obligations and change dimensions, see [compatibility vocabulary](../compatibility-review/vocabulary.md).
+For evidence and claim calibration, see [Calibrate security claims](SKILL.md#calibrate-security-claims); for consumer obligations and change dimensions, see [compatibility vocabulary](../compatibility-review/vocabulary.md).
