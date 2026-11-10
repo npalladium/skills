@@ -1,43 +1,38 @@
 ---
-name: architecture-documentation
+name: architect
 description: Analyze, review, or document codebase architecture. Triggers on requests about design quality, module structure, abstractions, seams, or architecture documentation (READMEs, ADRs, design docs). Not for general coding, bug fixes, or feature implementation.
 ---
 
-# Request shape
+# Load on demand
 
-Identify which mode(s) the request involves:
+Read only the files needed for the request:
 
-- **Review**—"is this well-designed?", "is this a good abstraction?"
-- **Document**—"write a README, ADR, or design doc for this"
-- **Decide**—"should I extract this?", "where should the seam go?"
+| Need | Load |
+|------|------|
+| Review design quality or decide where a seam belongs | [design.md](design.md) |
+| Write an architecture README, ADR, or Design Doc | Relevant template in [documentation.md](documentation.md) |
+| Define architecture terms, distinguish reserved meanings, or compare named patterns | Relevant entries in [vocabulary.md](vocabulary.md) |
+| Calibrate requirement detail or frame vision and scope | [requirements.md](requirements.md) |
+| Choose a diagram | [diagrams.md](diagrams.md) |
+| Review an architecture document before construction | [architecture-review.md](architecture-review.md) |
+| Review class/module design before construction | [module-review.md](module-review.md) |
 
-Most requests mix these. Be explicit about which mode each section of your response is in.
-
-# Load order
-
-Always load `vocabulary.md` first. Every architectural claim must use these terms.
-
-| Mode | Also load | Produce |
-|------|-----------|---------|
-| Review | `design.md` | Inline review (template in design.md §Output) |
-| Document | `documentation.md` | Architecture README, ADR, or Design Doc (templates in documentation.md) |
-| Decide | `design.md` | Recommendation grounded in named principles |
-
-In any mode, consult `checklists.md` for calibration and review aids: detail level per requirement, diagram selection, vision-and-scope sections, a pre-construction architecture review, and a class/module design review.
+Load only relevant files or sections, not every guide or source credits.
 
 A Design Doc is forward-looking—design before building; the README and ADR cover existing structure.
 
-# Constraints (all modes)
+# Constraints
 
-- Do not substitute vocabulary terms (*API, boundary, service, signature*) unless genuinely using their reserved sense.
-- Do not make claims without citing a named principle (deletion test, adapter count, depth, test surface, etc.).
-- Do not measure depth by implementation size—judge it as leverage read at the interface (a module property, read against its interface).
-- Do not recommend new seams unless two adapters exist or are imminent. If only one adapter exists, soften: "if a second adapter appears, this is where the seam should go."
+- Do not substitute vocabulary terms (*API, boundary, service, signature*) unless genuinely using their reserved sense. Before using these terms, consult their definitions in `vocabulary.md`.
+- Do not measure depth by implementation size—judge it as leverage at the interface.
+- Introduce a substitution interface only when multiple adapters exist or are imminent. A single implementation can justify module extraction through depth, invariant ownership, or a useful test surface; it does not by itself justify interchangeable implementations.
 
-# When the user pushes back on the vocabulary
+# When the user pushes back on terminology
 
-If they want a translation, do it—note the analysis was done in this vocabulary. If they reject it entirely, drop it. The vocabulary is a tool for thinking clearly, not a loyalty test.
+Translate it. If they reject the vocabulary entirely, drop it; terminology is a tool, not a loyalty test.
 
 # Related skills
 
-For tactics *inside* a module—control flow, state modelling, naming, testability seams—see `code-design`. For staging and history hygiene when committing design changes, see `commit`.
+Use `security-design` for security guarantees and authorization; `code-design` for intra-module tactics; `commit` for staging and history hygiene.
+
+Source attribution: [references.md](references.md) (load only when sources or provenance matter).

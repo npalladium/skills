@@ -2,13 +2,9 @@
 
 ## Output: Architecture README
 
-Use when the user asks to document a codebase, package, or module.
+Analyze the code before documenting it. Use the vocabulary's terms and reserved meanings consistently; consult relevant definitions when needed.
 
-Two jobs, in order: **analyze** code using the vocabulary in `vocabulary.md`, then **document** the result using the same vocabulary. Use terms exactly—the vocabulary is the whole point.
-
-Focus on what's unlikely to change frequently—invariants, layer boundaries, and module relationships. These are invisible when reading code alone. Avoid documenting things derivable easily from the code itself. Target audience: someone who knows the problem domain but not this codebase. Begin with a bird's-eye problem overview, then a codemap showing how modules relate.
-
-Document why unusual or surprising design choices exist (Chesterton's Fence). Without explicit rationale, future maintainers assume arbitrary choices and remove load-bearing structure.
+Focus on invariants, layer relationships, and module seams that are unlikely to change frequently; omit facts easily derived from code. Write for someone who knows the problem domain but not this codebase. Start with a bird's-eye overview and codemap. Record why unusual or surprising choices exist (Chesterton's Fence).
 
 ```markdown
 # [Codebase / Package / Module Name]
@@ -21,16 +17,16 @@ Document why unusual or surprising design choices exist (Chesterton's Fence). Wi
 - **Interface:** [Full set of facts, not just types.]
 - **Seam:** [Where the interface lives.]
 - **Depth:** [Deep/shallow + one-line justification.]
-- **Adapters:** [List if multiple; note if only one.]
+- **Adapters:** [For substitution interfaces, list existing or imminent adapters and what varies.]
 
 ## Seams
-[Non-trivial ones. For each: what varies, which adapters exist, why the seam is here.]
+[Non-trivial ones. For each: what complexity or invariants it owns, what callers or tests exercise, and why it lives here. For substitution interfaces, also identify variation and adapters.]
 
 ## Design decisions
 [Non-obvious choices, citing principles: "We accepted a shallow module because...", "Seam location chosen because the deletion test showed..."]
 
 ## Non-decisions
-[Where a seam is deliberately absent. "One adapter for X; no seam introduced because nothing varies across it yet."]
+[Deliberately omitted structure. "One adapter for X and no second is imminent; no substitution interface introduced. The concrete module owns the invariant directly."]
 
 ## Lenses
 Include whichever lenses are relevant to the system. Omit those that don't apply.
@@ -96,4 +92,4 @@ Cite principles for the non-obvious choices; note alternatives rejected.]
 
 ## Caveats
 
-- Design docs show *intended* design, not current system state. They're starting points for understanding, not authoritative documentation of how systems actually work. Always verify claims in design docs against current code before citing them in analysis.
+- Design docs show intended design, not current system state. Verify claims against current code before treating them as facts.

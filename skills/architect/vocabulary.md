@@ -16,23 +16,24 @@ Every architectural claim should land in one of these terms. Each entry says wha
 **Depth**—Leverage at the interface: how much behaviour a caller (or test) can exercise per unit of interface they have to learn. **Deep** = a lot of behaviour behind a small interface. **Shallow** = the interface is nearly as wide as the implementation.
 - Interfaces that use domain vocabulary rather than invented abstractions are deeper—callers learn the domain once and can predict behavior system-wide.
 
-**Seam** *(Michael Feathers, Working Effectively with Legacy Code)*—A place where you can alter behaviour without editing in that place. The *location* at which a module's interface lives.
+**Seam**—A place where you can alter behaviour without editing in that place. The *location* at which a module's interface lives.
 - *boundary* → reserve for DDD's bounded context (a domain-modeling concept, distinct from where an interface sits).
 
 **Adapter**—A concrete thing that satisfies an interface at a seam. Describes *role* (what slot it fills), not substance (what's inside).
+
+**Substitution interface**—An interface introduced to let callers use interchangeable adapters. Distinct from extracting a cohesive module with one implementation.
 
 **Leverage**—What callers get from depth. More capability per unit of interface they learn. One implementation pays back across N call sites and M tests.
 
 **Locality**—What maintainers get from depth. Change, bugs, knowledge, and verification concentrate at one place. Fix once, fixed everywhere.
 
-**Coupling**—The degree to which modules rely on each other. Ranked from worst to best:
-1. *Pathological*—directly accessing another module's internals (private state, internal data structures).
-2. *Global*—multiple modules depend on shared mutable state (singletons, global variables).
-3. *Control*—passing flags/modes that change a module's behavior; the caller knows implementation details.
-4. *Data*—passing parameters that affect functionality; necessary but still coupling.
-5. *Message*—calling with no parameters; the loosest form, relying only on the interface name.
+**Coupling**—The degree to which modules rely on each other. Assess these dimensions rather than ranking calls by argument count:
+- *Representation knowledge*—how much a caller knows about another module's internals or data layout.
+- *Shared mutable state*—which modules can change state that others depend on, including hidden object or global state.
+- *Coordination*—required call ordering, lifecycle, timing, or caller-directed execution modes.
+- *Change propagation*—which other modules must change when this module changes; use connascence below to make this precise.
 
-Control coupling is a sign the seam is in the wrong place—split into separate modules or push the decision into the caller.
+A parameterless call can hide state and ordering dependencies; explicit inputs can reduce them. Judge what callers must know and coordinate, not the number of parameters.
 
 **Connascence**—A precise vocabulary for discussing coupling. Two pieces share connascence when *a change in one requires a corresponding change in the other*. Measured on three axes:
 - *Strength*—how difficult to discover and refactor (weaker is better).
@@ -49,24 +50,24 @@ A **Module** has exactly one **Interface**. An **Interface** promises **Invarian
 
 Reach for these by name; each lands in the core terms above.
 
-**Service Layer** *(Fowler, PoEAA)*—a use-case-oriented interface over a Domain Model: a deep module whose seam is the app's transaction/security boundary.
+**Service Layer**—a use-case-oriented interface over a Domain Model: a deep module whose seam owns the app's transaction/security policy.
 - *Add when* multiple presentations or external clients share the domain, or transactions/security/messaging cross-cut.
 - *Stay thin*—a facade over domain objects, thickened only on demonstrated need. Behaviour stays on the objects; an anemic "controller-entity" holding all the logic is the anti-pattern. A pure Transaction Script app needs none.
 
-**Domain Model** *(Fowler, PoEAA)*—the domain as a network of behaviour-bearing objects around its nouns; validation and calculation live on the object they concern, forwarded between collaborators.
+**Domain Model**—the domain as a network of behaviour-bearing objects around its nouns; validation and calculation live on the object they concern, forwarded between collaborators.
 - Reach for it as business rules grow complex and evolving, or product/contract types vary richly—payoff scales with rule complexity.
 - A thin Service Layer over a rich Domain Model is the canonical pairing.
 
-**Gateway** *(Fowler, PoEAA)*—an adapter wrapping an external system (third-party API, messaging, legacy package, even a DB) behind one domain-shaped interface.
-- A test-time Service Stub is the second adapter that makes the seam real, so tests cross it instead of the live system.
+**Gateway**—an adapter wrapping an external system (third-party API, messaging, legacy package, even a DB) behind one domain-shaped interface.
+- A test-time Service Stub is a concrete second adapter when tests need to cross the interface without the live system.
 - Wrap for that reason, not "just in case".
 
-**Pipes and Filters** *(POSA)*—a stream-processing system split into independent filters (modules) joined by pipes.
-- Each filter consumes input incrementally, transforms it, and emits output incrementally; the pipe is the only connection—data flows through, nothing else shared (Data coupling, near the loose end of the ladder).
+**Pipes and Filters**—a stream-processing system split into independent filters (modules) joined by pipes.
+- Each filter consumes input incrementally, transforms it, and emits output incrementally; the pipe is the only connection. Coupling remains in the stream contract: schema, ordering, and flow control.
 - A uniform stream interface lets you recombine filters into new pipelines without changing them.
 
 ## Framings to reject
 
-- **Depth as ratio of implementation-lines to interface-lines** (Ousterhout's original): rewards padding the implementation. Use depth-as-leverage.
+- **Depth as ratio of implementation-lines to interface-lines**: rewards padding the implementation. Use depth-as-leverage.
 - **"Interface" as the TypeScript `interface` keyword or a class's public methods**: too narrow. Interface here includes every fact a caller must know.
 - **"Boundary"** as a synonym for seam or interface: keep it for DDD's bounded context.
