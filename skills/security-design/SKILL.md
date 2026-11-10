@@ -12,12 +12,11 @@ Reason from guarantees and complete authority paths, not feature names or checkl
 
 ## Start with these questions
 
-- What invariants must this change preserve?
+- What invariants must be preserved?
 - Where does data or authority cross a trust boundary?
-- Does the implementation make invalid states difficult to represent?
-- What happens when a dependency lies, fails, or returns unexpected data?
-- Can a partial failure, retry, or concurrent operation violate a guarantee?
 - Can the system be understood, tested, audited, and repaired when something goes wrong?
+  - Does the implementation make invalid states difficult to represent?
+- Can a partial failure, retry, or concurrent operation violate a guarantee?
 
 Use [checklists.md](checklists.md) for implementation and review questions, [vocabulary.md](vocabulary.md) for disputed terms, and [worked examples](references/examples.md) for calibration.
 
@@ -25,17 +24,13 @@ Use [`compatibility-review`](../compatibility-review/SKILL.md) for consumer obli
 
 ## Design principles
 
-### Scale protection to loss
+### Establish and preserve required protection
 
-Identify whose resources and operations are protected, against what threats, and under which conditions. Scale protection and verification rigor to the consequences of failure—not the size of the change. Distinguish documented requirements, reasonable domain expectations, and unresolved assumptions; principles alone do not establish project policy.
+Identify whose resources and operations are protected, against what threats, and under which conditions. Establish applicable security requirements and their sources; distinguish requirements, justified domain expectations, and unresolved assumptions.
 
 ### Bound and justify trust
 
-Identify the components whose failure would invalidate the guarantee and the evidence supporting reliance on them. “Internal,” “authenticated,” or “managed” is not a blanket trust claim. Minimize security-critical components and interactions; account for their own mistakes as well as dependency failure. Internal or legacy protocols need reassessment when exposed to customer-controlled infrastructure.
-
-### Protect enforcement
-
-Protect the mechanism and the policy, configuration, and identity inputs it uses from bypass and unauthorized modification. Keep them small enough to evaluate. Complete mediation covers alternate and lifecycle paths; cached decisions are valid only within their scope and revocation semantics, not necessarily by querying the database on every access.
+Identify the components whose failure would invalidate the guarantee and the evidence supporting reliance on them. Minimize security-critical components and interactions; account for their own mistakes as well as dependency failure.
 
 ### Bind authority across domains
 
@@ -81,7 +76,7 @@ Protective defaults should not depend on operators discovering an unsafe initial
 4. **Challenge failure semantics.** Examine failure, concurrency, and recovery across transaction and external-effect boundaries. A lost response does not establish that nothing happened; compensation is not necessarily rollback.
 5. **Try to falsify the concern.** Seek checks elsewhere, valid delegation, and safe sibling paths. Establish a real affected path and concrete violating scenario before calling a suspicious pattern a defect.
 6. **Verify at the enforcing boundary.** Use isolated scenarios that distinguish correct behavior from plausible failure, covering relevant allow/deny and lifecycle cases. Check the whole relevant test module after a change. Use harmless fixtures; production or third-party probes require explicit authorization. Obey the scout run brief; when execution is unavailable or unauthorized, report static support and verification limits.
-7. **Review and report.** Apply the [review checklist](checklists.md#d-during-review) and [reporting fields](checklists.md#e-report-significant-findings).
+7. **Review and report.** Apply the [review checklist](checklists.md#d-during-review) and [reporting fields](#report-significant-findings).
 
 ## Calibrate security claims
 
@@ -91,5 +86,16 @@ Protective defaults should not depend on operators discovering an unsafe initial
 - **Distinguish consent from scope excess.** Owner-granted, visible, revocable authority chains can be intended composition. Neither customer ownership nor documented setup excuses an effect beyond the grant. Attribute a failed identity binding to the component that owns it, not automatically to the platform.
 - **Assess configuration, not blame.** Recommended setup or generated templates may assemble a flaw's preconditions. That can widen exposure, not excuse the flaw; establish which configurations and paths are actually affected.
 - **Bound the impact.** Shared identities are a possible carrier, not proof of cross-tenant reach; per-tenant identities do not exclude namespace, hierarchy, or derived-data crossings. Establish the affected owner and final-target restriction.
-- **Bound the evidence.** Separate source facts, runtime observations, and assumptions at every link. An unverified downstream step limits the claimed impact, not necessarily the independently established defect. Static analysis is not runtime confirmation; no finding is not comprehensive assurance.
+- **Bound the evidence.** Separate source facts, runtime observations, and assumptions at every link; identify evidence needed to resolve unverified links. An unverified downstream step limits the claimed impact, not necessarily the independently established defect. Static analysis is not runtime confirmation; no finding is not comprehensive assurance. Keep severity separate from confidence.
 
+## Report significant findings
+
+For each significant finding, provide:
+
+1. **Claim and evidence level:** a substantiated defect, supported design concern, or unresolved question; state whether support is static, runtime, or mixed. In scout mode use the shared signal kinds from `scout-repository`.
+2. **Invariant or contract:** what should hold, its scope and authority source. If the concern also changes a consumer expectation, use `compatibility-review` for its independent classification.
+3. **Affected path:** entry point, caller identity, relevant boundary/enforcement point, dependency or state transition, and affected resource/consumer.
+4. **Evidence:** file/line or other locator, test or runtime evidence, counterevidence, assumptions, and what remains unverified.
+5. **Counterexample:** the request, state, interleaving, or lifecycle that violates the guarantee; for escalation, the consumer of any staged artifact and capability beyond baseline. For compatibility, give old/new behavior.
+6. **Consequence and extent:** confidentiality, integrity, availability, compatibility, or maintainability impact; prerequisites, baseline caller authority, and plausible blast radius.
+7. **Narrowest sound next step:** remediation, verification, or owner decision. Do not prescribe a control broader than the demonstrated requirement.
