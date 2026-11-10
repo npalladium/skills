@@ -1,0 +1,18 @@
+# Security Design References
+
+Provenance for the local principles, review questions, and calibration examples. The local guidance is a synthesis, not a quotation or adoption of every source requirement. These links provide deeper treatment; ordinary use does not require reading them all.
+
+## Primary foundations
+
+- [Saltzer–Schroeder: The Protection of Information in Computer Systems](https://www.cs.virginia.edu/~evans/cs551/saltzer/), I.A.3—economy of mechanism, fail-safe defaults, complete mediation, open design, separation of privilege, least privilege, least common mechanism, and psychological acceptability. Informs enforcement, narrow authority, sharing, and usable controls; departures prompt investigation rather than establish defects.
+- [NIST SP 800-160 Vol. 1 Rev. 1: Engineering Trustworthy Secure Systems](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-160v1r1.pdf), Appendix E—commensurate protection and rigor (E.3, E.5–E.6); composition and independent protection (E.7, E.9–E.10); bounded trust and exposure (E.13–E.17, E.20, E.27, E.29); continuous protection, failure, and recovery (E.8, E.23–E.24); detection and response (E.1, E.4); mediated access and trustworthy control (E.19, E.30); abstractions, defaults, and complexity (E.2, E.22, E.25, E.28). Section 2.3 and Appendix F distinguish trust from justified trustworthiness. The principles are reasoning aids, not a compliance checklist.
+- [OWASP Developer Guide: Security Principles](https://github.com/OWASP/DevGuide/blob/main/docs/en/02-foundations/03-security-principles.md)—application-security design, protective defaults, least privilege, defense in depth, and manageable controls. Its [Secure Product Design Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secure_Product_Design_Cheat_Sheet.html) expands the practical design guidance.
+- [Kat Traxler: Security Constitution](https://github.com/KatTraxler/security-constitution/blob/main/phase%202%20-%20security%20constitution/security-constitution.md)—cross-service authorization completeness, secret custody, and protected connectivity; reference resolution (A2), network source position (A5), namespace provenance (A8), derived-state authorization (A11), temporal binding (A12), and authorization-subject survival (A13). Informs authority-path questions and negative calibration. Generative anchors are leads, not proven universal defect patterns; the cloud taxonomy and runtime threshold for confirmed exploitable findings are specialized.
+
+## Supporting guidance
+
+- [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)—authorization design and enforcement guidance.
+- [OWASP ASVS](https://asvs.owasp.org/)—select applicable, versioned application-verification requirements; this skill does not replace them.
+- [OWASP FIASSE: Securability](https://github.com/OWASP/FIASSE/blob/main/skills/securability/SKILL.md)—canonical input handling, server-authoritative integrity, boundary control, and maintainability. Informs representation agreement and authoritative-data questions.
+- [GitLab: Authorization Code Review Guidelines](https://docs.gitlab.com/development/permissions/review_guidelines/)—resource-specific enforcement, policy decision dependencies, and testing real authorization rather than stubbing the permission under test. Its role definitions, Ruby helpers, and framework conventions are not general requirements.
+- [Threat Modeling Manifesto](https://www.threatmodelingmanifesto.org/)—iterative, fit-for-purpose analysis and useful outcomes rather than a mandatory notation or methodology.
