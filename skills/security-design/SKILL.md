@@ -3,12 +3,12 @@ name: security-design
 description: Design, implement, or review security guarantees in applications and services. Use for authentication, authorization, tenant isolation, delegated authority, sensitive data, trust boundaries, state integrity, dependency failures, and security-relevant lifecycle changes. Not a vulnerability scanner, penetration-test procedure, or replacement for applicable domain standards.
 metadata:
   author: npalladium
-  version: "2.1.0"
+  version: "2.2.0"
 ---
 
 # Security Design
 
-Reason from intended behavior, invariants, authority, and system paths—not feature names or checklist matches. Apply during design, implementation, and review. Distinguish a supported design concern from a runtime-demonstrated defect. Not every prompt applies; do not invent requirements or perform speculative hardening.
+Reason from guarantees and complete authority paths, not feature names or checklist matches. Establish the relevant threat model; do not invent requirements or speculative hardening.
 
 ## Start with these questions
 
@@ -19,24 +19,77 @@ Reason from intended behavior, invariants, authority, and system paths—not fea
 - Can a partial failure, retry, or concurrent operation violate a guarantee?
 - Can the system be understood, tested, audited, and repaired when something goes wrong?
 
-Read [principles.md](principles.md) for the reasoning, then select relevant questions from [checklists.md](checklists.md). Use [vocabulary.md](vocabulary.md) for essential distinctions and [worked examples](references/examples.md) to calibrate authority-path concerns. Source links and provenance are collected in [references.md](references.md); ordinary use does not require opening them.
+Use [checklists.md](checklists.md) for implementation and review questions, [vocabulary.md](vocabulary.md) for disputed terms, and [worked examples](references/examples.md) for calibration.
 
-This skill owns security reasoning. Use [`compatibility-review`](../compatibility-review/SKILL.md) for consumer obligations across change, and [`scout-repository`](../scout-repository/SKILL.md) for stateless/stateful context, deduplication, memory, and reporting operation. [`scout-authorization-invariants`](../scout-authorization-invariants/SKILL.md) is the focused read-only authorization review entry point. Load companions only when applicable; if required by the selected mode but unavailable, report the dependency rather than inventing its procedure. Use `code-design` for construction tactics and `architect` for broader architecture design.
+Use [`compatibility-review`](../compatibility-review/SKILL.md) for consumer obligations and [`scout-repository`](../scout-repository/SKILL.md) for scout operation, memory, and reporting. [`scout-authorization-invariants`](../scout-authorization-invariants/SKILL.md) is the focused authorization scout; `code-design` covers construction tactics and `architect` broader design. Load companions only when applicable; report missing required guidance rather than inventing it.
+
+## Design principles
+
+### Scale protection to loss
+
+Identify whose resources and operations are protected, against what threats, and under which conditions. Scale protection and verification rigor to the consequences of failure—not the size of the change. Distinguish documented requirements, reasonable domain expectations, and unresolved assumptions; principles alone do not establish project policy.
+
+### Bound and justify trust
+
+Identify the components whose failure would invalidate the guarantee and the evidence supporting reliance on them. “Internal,” “authenticated,” or “managed” is not a blanket trust claim. Minimize security-critical components and interactions; account for their own mistakes as well as dependency failure. Internal or legacy protocols need reassessment when exposed to customer-controlled infrastructure.
+
+### Protect enforcement
+
+Protect the mechanism and the policy, configuration, and identity inputs it uses from bypass and unauthorized modification. Keep them small enough to evaluate. Complete mediation covers alternate and lifecycle paths; cached decisions are valid only within their scope and revocation semantics, not necessarily by querying the database on every access.
+
+### Bind authority across domains
+
+Operation permission, permission to reference a resource, and authority over its contents are different grants. Trace the original caller, acting identity, target owner, and grant at each domain transition. Assign enforcement to a component that can join the verified caller with the target's policy; two correct checks on different principals do not compose into caller authorization.
+
+Distinguish authority derived from the caller from an independent grant the caller can steer. An orchestration service may legitimately exercise permissions the caller lacks; the question is whether target selection escapes its authorized purpose or scope. Binding a run-as identity requires delegation authority; invoking a workload already bound by an authorized administrator is a different operation.
+
+Owner consent to a shared service or fleet does not authorize every caller using it. Likewise, delivering a credential to an execution environment gives usable authority to principals able to run code there: signing, decrypting, or connecting matters even when extraction is impossible.
+
+### Identify what carries trust
+
+Trust may ride on a network position, global name, hierarchy, user selector, derivative, or earlier decision—not just a shared identity. Ask who can occupy, register, change, or redirect that carrier and what binds it to the intended owner at the effect.
+
+A parent governance role may intentionally control descendants; an incidental metadata role changing their security posture is different. Separate intra-tenant separation of duties from cross-tenant reach. Authorization to ingest data does not authorize everyone who can query its derivative; deliberate owner-granted sharing of curated output is not an ACL bypass.
+
+### Keep authority governable
+
+Where the protection model relies on administrator control, grants and durable credentials must be discoverable, scopeable, and revocable. Define direct disablement and account-remediation effects separately; resetting a password need not revoke independent credentials. A schedule or cached artifact may retain authority after its creator loses access: define whether authority belongs to the creator or an independently authorized workload, and when it must be rechecked.
+
+### Minimize capability and sharing
+
+Limit human and workload authority, enabled functionality, exposure time, and retained data to the task. Short lifetimes help only if renewal and recovery remain trustworthy. Shared state, credentials, and mechanisms create influence and failure-propagation paths; neither centralization nor duplication is inherently safer.
+
+### Evaluate composition
+
+Check agreement on representations, identities, state transitions, and failure behavior between components. Validation and use must interpret the same target; well-formed input is not authoritative. For layered defenses, identify what remains effective after one fails: controls sharing policy, identity, or configuration may fail together. Required independent approvals are ineffective if one principal can satisfy all of them or rewrite their rules.
+
+### Preserve protection through failure and recovery
+
+Deny protected actions when authority is unknown, but do not assume stopping all activity is the safest availability or safety outcome. Specify protection during initialization, maintenance, degraded operation, recovery, and intentional overrides.
+
+Contain both the original failure and its propagation. Restore and replay must not resurrect revoked authority or repeat irreversible effects. Detection and response also need a failure model: a mistaken alert or disruptive defensive action can create another loss or foreclose recovery.
+
+### Make secure operation usable
+
+Protective defaults should not depend on operators discovering an unsafe initial state. Make granted authority and consequential actions visible; confusing prompts and difficult workflows invite workarounds. Do not depend on secrecy of the design. Established mechanisms still need their integration assumptions checked; structural simplicity is valuable when it improves enforcement, analysis, or repair.
 
 ## Workflow
 
-1. **Bound the task and state the guarantee.** Identify the requested behavior, protected resources/actions, initiating principals, tenants or authorization domains, and applicable current contracts. State what must remain inaccessible, unchanged, or impossible and where the invariant must hold. Include availability and recovery requirements where relevant. Attribute requirements to project specifications or confirmed owner intent; mark unresolved assumptions rather than inventing policy.
-2. **Trace data and authority.** Follow the complete affected path through callers, effective identities, target resources, storage, dependencies, jobs, derived artifacts, and side effects. Identify the authoritative component for each important fact and the enforcing point for each policy. Include alternate entry points and relevant initialization, maintenance, revocation, deletion, and recovery paths.
-3. **Inspect boundaries and state.** Ask whether the exact caller/action/target is authorized in each domain—not merely authenticated, permitted to invoke an intermediary, or replaced with a service identity. Inspect caller-controlled resource references, run-as identities, network attachments, callbacks, destinations, and secret-bearing configuration. Verify source permissions survive caching, indexing, exporting, and serving. Types can exclude malformed states but do not eliminate mutable-state or authorization races.
-4. **Challenge failure semantics.** Trace denial, bad dependency data, timeout, cancellation, partial success, retry/replay, concurrency, stale state, expiry, and recovery where they affect the guarantee. Identify transaction and external-effect boundaries. A lost response does not establish that nothing happened; compensation is not necessarily rollback.
-5. **Try to falsify the concern.** Look for caller-bound checks elsewhere, target-owner policy, deliberate delegation, scoped and revocable grants, tenant-bound identities, safe sibling paths, and other counterevidence. Powerful functionality alone is not a flaw. A suspicious API or missing-looking check is a lead; establish a real affected path and a concrete violating scenario before calling it a defect.
-6. **Verify at the enforcing boundary.** Run the authorized isolated scenario or relevant test that distinguishes the intended behavior from the plausible failure. Exercise allowed and denied principal/resource/tenant combinations and applicable lifecycle or failure cases. Check the whole relevant test module after a change, not only the expected-to-flip assertion. Use harmless fixtures; do not probe production or another party's resources without explicit authorization. In scout mode obey its run brief; if execution is not authorized or available, report static support and verification limits instead of claiming reproduction.
-7. **Check the whole change and report precisely.** Review affected callers, tests, configuration, migrations, deployment, and recovery behavior—not just edited lines. Check that a fix preserves other intended guarantees and exposes no unrelated data or authority. Report the guarantee, path, evidence, counterexample, consequence, limits, and smallest sound remediation using [`checklists.md`](checklists.md#e-report-significant-findings). Unsupported impact chains remain hypotheses.
+1. **State the guarantee.** Bound the behavior, protected resources, principals, and authorization domains. Identify the requirement's source, where the invariant must hold, and unresolved assumptions; include availability and recovery where relevant.
+2. **Trace data and authority.** Follow the complete affected path, including alternate entry points and lifecycle operations. Identify effective identities, authoritative facts, policy enforcement, and downstream effects.
+3. **Inspect boundaries and state.** Apply the relevant checklist questions to exact caller/action/target authorization, derived-data permissions, and state transitions. Types do not eliminate mutable-state or authorization races.
+4. **Challenge failure semantics.** Examine failure, concurrency, and recovery across transaction and external-effect boundaries. A lost response does not establish that nothing happened; compensation is not necessarily rollback.
+5. **Try to falsify the concern.** Seek checks elsewhere, valid delegation, and safe sibling paths. Establish a real affected path and concrete violating scenario before calling a suspicious pattern a defect.
+6. **Verify at the enforcing boundary.** Use isolated scenarios that distinguish correct behavior from plausible failure, covering relevant allow/deny and lifecycle cases. Check the whole relevant test module after a change. Use harmless fixtures; production or third-party probes require explicit authorization. Obey the scout run brief; when execution is unavailable or unauthorized, report static support and verification limits.
+7. **Review and report.** Apply the [review checklist](checklists.md#d-during-review) and [reporting fields](checklists.md#e-report-significant-findings).
 
 ## Calibrate security claims
 
-- **Invocation is not escalation.** Identify the caller's baseline authority and the additional data, authority, or effect gained. An accepted request or intermediary-side effect does not by itself establish unauthorized downstream access. For integrity or availability concerns that are not escalation, show the applicable guarantee and effect rather than forcing an escalation model.
-- **Delegation may be intended.** Customer-configured, visible, scoped, revocable authority composition can be a valid control model. Conversely, documented setup is not proof of safety if a caller can exceed the intended scope.
-- **Control presence is not control sufficiency.** A check in one domain may not authorize the target in another; an index permission may not preserve source-record restrictions. Inspect what the control actually binds.
-- **Match the evidence to the claim.** Keep source facts, runtime observations, and assumptions distinct. A static path can substantiate a design defect without exploit execution, but cannot be called runtime-confirmed. No finding is not proof of comprehensive security.
+- **State the contradiction.** Contrast the documented boundary or justified expectation with achievable behavior. Surprise alone is not a security requirement.
+- **Trace the effect to its consumer.** For escalation, identify the caller's baseline and the surface that turns a deputy's output into additional capability. Acceptance or intermediate staging alone does not prove access. Integrity and availability failures need a violated guarantee, not capability transfer.
+- **Test the actual gate.** A relationship field is not proof of enforcement. A cross-tenant denial may only mean the deputy lacks target permission; it does not establish a caller-bound check. Vary caller permission and the purported gate independently in authorized fixtures.
+- **Distinguish consent from scope excess.** Owner-granted, visible, revocable authority chains can be intended composition. Neither customer ownership nor documented setup excuses an effect beyond the grant. Attribute a failed identity binding to the component that owns it, not automatically to the platform.
+- **Assess configuration, not blame.** Recommended setup or generated templates may assemble a flaw's preconditions. That can widen exposure, not excuse the flaw; establish which configurations and paths are actually affected.
+- **Bound the impact.** Shared identities are a possible carrier, not proof of cross-tenant reach; per-tenant identities do not exclude namespace, hierarchy, or derived-data crossings. Establish the affected owner and final-target restriction.
+- **Bound the evidence.** Separate source facts, runtime observations, and assumptions at every link. An unverified downstream step limits the claimed impact, not necessarily the independently established defect. Static analysis is not runtime confirmation; no finding is not comprehensive assurance.
 

@@ -28,4 +28,4 @@ These abstract examples calibrate the workflow; they are not exhaustive vulnerab
 
 ## Negative calibration
 
-A capable feature is not inherently a flaw. A security finding needs a specific guarantee, a missing or bypassed control, a principal/resource path, and an effect beyond the caller's baseline. Where authorization is visible, deliberately granted, scoped, and revocable, investigate whether the behavior is intended before labeling it insecure by design.
+A capable feature is not inherently a flaw. Identify the violated guarantee and affected path; an escalation claim also needs an effect beyond the caller's baseline. Visible, deliberately granted, scoped, and revocable authority can be intended composition, but does not excuse exceeding the grant.
