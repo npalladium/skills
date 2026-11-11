@@ -1,12 +1,12 @@
 ---
 name: commit
-description: Stage, message, and commit/push changes safely. Use whenever creating a git commit, pushing, or force-pushing — covers staging discipline, the commit-message format, pre-commit hooks, and test gating.
+description: Prepare and publish commits safely. Use when staging changes, writing commit messages, committing, amending, squashing, rewriting commits, pushing, or force-pushing — covers staging discipline, message conventions, pre-commit hooks, and verification.
 metadata:
   author: npalladium
   version: "1.0.0"
 ---
 
-# Committing
+# Preparing and publishing commits
 
 ## What to commit
 
@@ -27,23 +27,20 @@ One logical change per commit; don't mix refactors, features, fixes, or reformat
 - For partial commits, ensure omitted changes aren't needed to build or test. Leave unrelated scratch files untouched and uninspected.
 
 ## Message format
-Follow any commit convention provided by repository instructions already in context. Otherwise use this convention: an imperative subject of at most 50 characters with no trailing period. Lead with one verb:
+Follow any commit convention provided by repository instructions already in context. Otherwise use this convention: an imperative subject of at most 50 characters with no trailing period. Lead with an imperative verb:
 
-| Verb | Use for |
-|------|---------|
-| Add / Drop | create / delete a capability (feature, test, dependency) |
-| Remove | delete a capability, file, dependency, or obsolete code |
-| Fix | bug, typo, accident, misstatement |
-| Bump | increase a version (e.g. a dependency) |
-| Update | change existing behavior, content, or configuration when no more specific verb fits |
-| Make | build process, tooling, infrastructure |
-| Start / Stop | enable / disable a toggle or feature flag |
-| Optimize | performance only |
-| Document / Rephrase | docs/comments only (Document = help files; Rephrase = textual edit) |
-| Refactor / Reformat | behavior-preserving: code structure / whitespace only |
-| Rename / Move | change identity or location without changing behavior |
-| Test | add or revise tests without changing production behavior |
-| Revert / Restore | undo a previous change or restore removed behavior |
+- Add / Drop / Remove
+- Fix
+- Bump — version increases
+- Update — when no more specific verb fits
+- Make
+- Start / Stop
+- Optimize — performance only
+- Document / Rephrase
+- Refactor / Reformat — preserve behavior
+- Rename / Move
+- Test — tests only, without production-code changes
+- Revert / Restore
 
 Body: wrap at 72 chars. Fields, in order — include only non-empty ones; detail
 proportional to the patch's size/importance:
@@ -52,7 +49,8 @@ proportional to the patch's size/importance:
 - `Changes:` how it's done — implementation, algorithm, approach.
 - `Tags:` searchable keywords (optional).
 - `Fixes:` / `See also:` ticket or resource links (optional).
-- `Test Plan:` how it was verified (optional).
+- `Verification:` checks actually performed and their results (optional).
+- `Test Plan:` how the change can or should be verified (optional).
 
 Omit a field's line entirely when empty — don't emit bare `Tags:` headers.
 
@@ -68,7 +66,7 @@ Changes:
 Take a per-worktree flock before touching the index; release in a trap
 so it clears on any exit path.
 
-Test Plan:
+Verification:
 Ran 50x parallel commit loop across two worktrees; no stale locks.
 ```
 
