@@ -12,7 +12,7 @@ Each phase gates the next — **do not proceed** until the current phase is comp
 
 **Iron law:** NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.
 
-When a phase stalls—no hypotheses in Phase 4, a fix that won't hold in Phase 6—see `checklists.md` for McConnell's debugging reminders (finding the defect, fixing it, general approach).
+When a phase stalls—no hypotheses in Phase 4 or a fix that won't hold in Phase 6—see [`checklists.md`](checklists.md) for targeted debugging reminders.
 
 ## Phase 1 — Build a feedback loop
 
@@ -33,11 +33,15 @@ When a phase stalls—no hypotheses in Phase 4, a fix that won't hold in Phase 6
 
 ### Refine the loop
 
-Make it faster (cache setup, narrow scope), sharper (assert on specific symptom, not "didn't crash"), more deterministic (pin time, seed RNG, freeze network). A 2-second deterministic loop is a superpower; a 30-second flaky loop barely counts.
+Make it faster (cache setup, narrow scope), sharper (assert on the specific symptom, not just "didn't crash"), and more deterministic (pin time, seed RNG, freeze network).
 
-### Non-deterministic bugs
+Where available, check the diagnostic against known-good and known-bad controls; verify it distinguishes them for the expected reason.
 
-Goal: raise reproduction rate. Loop 100x, parallelise, add stress, narrow timing windows. A 50% flake is debuggable; 1% is not.
+**Reduce the reproducer.** Remove irrelevant input, setup, and steps; automate reduction when manual shrinking stalls. Accept a candidate only if it preserves the specific failure—not merely any error. Bound each trial and isolate parallel trials. A smaller case is not better if it makes the failure harder to reproduce.
+
+### Intermittent bugs
+
+Measure failures and trial counts under controlled conditions. Increase reproduction rate where possible with repetition, stress, or narrower timing windows. Compare before and after under the same conditions; a few passing runs do not establish a fix. Recheck after instrumentation changes, which may hide or alter the failure.
 
 ### If you cannot build a loop
 
@@ -45,40 +49,46 @@ Stop. List what you tried. Ask the user for: environment access, a captured arti
 
 ## Phase 2 — Reproduce
 
-Run the loop. Confirm: (1) it produces the failure the **user** described, not a nearby one; (2) it's reproducible across runs; (3) you've captured the exact symptom for later verification. **Do not proceed until reproduced.**
+Run the loop. Confirm it produces the failure the **user** described, not a nearby one; capture the exact symptom and measure its frequency. Verify the request or action reaches the intended process, device, endpoint, and code path, and confirm the running artifact/version and active configuration. Check for stale builds, unrestarted processes, wrong URLs, and caches. **Do not proceed until the target and symptom are confirmed.**
 
-## Phase 3 — Investigate root cause
+## Phase 3 — Investigate and localize
 
-**Complete at least one step below before hypothesising.**
+Gather evidence before proposing a cause:
 
-- **Read error messages.** Full stack traces — line numbers, file paths, error codes. They often contain the answer.
-- **Check recent changes.** Git diff, recent commits, new deps, config changes, env differences.
-- **Trace data flow backward.** Don't fix where the error appears. Trace up the call chain: what called this with a bad value? Keep going until you find the **original trigger**. Fix at source.
-- **Multi-component systems.** Instrument each component boundary (log data in/out, verify config propagation) and run once to locate WHERE it breaks, before proposing fixes.
+- **Read error messages carefully.** Inspect full stack traces, paths, codes, and surrounding normal behavior—not just the first apparent error.
+- **Compare working and failing cases.** Check relevant code/artifact versions, runtime mode, configuration, data, dependencies, services, permissions, OS/architecture, and timing. Compare actual values and identities, not intended setup.
+- **Trace data flow backward.** Follow the bad value or state toward its origin; distinguish where the error appears from where it was triggered.
+- **Bracket the divergence.** Find a checkpoint where the relevant state is correct and a later one where it is wrong; probe between them to locate where it first changes. Use bisection when outcomes support it, preserving interacting conditions rather than assuming a single culprit.
+- **For multi-component systems,** instrument boundaries (inputs, outputs, and configuration propagation) and run once to locate where behavior diverges.
+- **Use two-ended reduction.** When a passing case exists, simplify the failure and extend the working case toward it while preserving their contrasting outcomes. The smallest contrasting pair can expose a missing condition.
+
+Localization narrows where or under what conditions the failure occurs; it does not establish why. A reduced input, suspect component, or bisected location is evidence, not a causal explanation.
 
 ## Phase 4 — Hypothesise
 
-Generate **3–5 ranked, falsifiable hypotheses** before testing any. Each states a prediction: "If X is the cause, then changing Y makes the bug disappear / changing Z makes it worse." No prediction → discard it.
+Generate **3–5 ranked, falsifiable causal hypotheses** before testing causes. Each predicts an observation: "If X is the cause, changing Y makes the bug disappear; changing Z makes it worse." No prediction → discard it. Localization probes in Phase 3 may precede this phase; do not mistake localization for causal confirmation.
 
-For complex bugs (multi-component, cross-cutting, unclear root cause): **show the list to the user** — they often re-rank or rule out instantly. For simple bugs, test directly and report.
+For complex bugs (multi-component, cross-cutting, unclear cause), **show the list to the user**—they often re-rank or rule out hypotheses. For simple bugs, test directly and report.
 
-**Do not proceed without falsifiable hypotheses.**
+**Do not fix until a causal hypothesis is supported.**
 
 ## Phase 5 — Instrument and test
 
-One probe per prediction. **One variable at a time.** Prefer debugger/REPL over logs; prefer targeted logs over "log everything." Tag all debug artifacts with a unique prefix (`[DEBUG-a4f2]`) for easy cleanup.
+Test one causal prediction per probe; change one variable at a time. Prefer debugger/REPL over logs; prefer targeted logs over "log everything." Tag debug artifacts with a unique prefix (`[DEBUG-a4f2]`) for cleanup. After instrumentation, verify the original failure still reproduces.
+
+Inspect the value actually consumed or produced; independently recomputing it in a log or probe can misrepresent the executed path.
 
 **Perf bugs:** measure first (timing harness, profiler, query plan), then bisect. Logs mislead.
 
-**Do not proceed until a hypothesis is confirmed** (or all ruled out → return to Phase 3).
+**Do not proceed until a causal hypothesis is confirmed** (or all are ruled out → return to Phase 3).
 
 ## Phase 6 — Fix + regression test
 
 **3-fix rule:** 3+ failed fixes → STOP. This is architectural, not a simple bug. Discuss with the user.
 
-Otherwise: (1) write regression test at a **correct seam** before fixing (if no seam exists, document it); (2) watch it fail; (3) fix; (4) watch it pass; (5) re-run Phase 1 loop.
+Otherwise: (1) write a regression test at a **correct seam** before fixing and watch it fail; if no seam exists, document that exception; (2) fix; (3) if a regression test was added, watch it pass; (4) re-run the Phase 1 loop.
 
-**Do not proceed until the test passes and the Phase 1 loop confirms the fix.**
+**Do not proceed until the regression test passes (or the absent seam is documented) and the Phase 1 loop confirms the fix.**
 
 ## Phase 7 — Cleanup + post-mortem
 
@@ -87,9 +97,7 @@ Otherwise: (1) write regression test at a **correct seam** before fixing (if no 
 - [ ] All `[DEBUG-...]` artifacts removed (grep the prefix).
 - [ ] Throwaway harnesses deleted.
 - [ ] Correct hypothesis stated in commit/PR message.
-- [ ] **Defense in depth:** validation added at other layers the bad data passes through?
-
-**Then ask: what would have prevented this bug?** Recommend architectural changes after the fix is in.
+- [ ] **Prevention gap:** identify whether a stronger design invariant, assertion/automated test, or diagnostic would have prevented, detected, or explained the defect sooner. Recommend the specific change after the fix.
 
 ## Red flags — STOP, return to earliest incomplete phase
 

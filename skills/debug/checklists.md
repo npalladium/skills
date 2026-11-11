@@ -1,8 +1,6 @@
 # Debugging reminders
 
-*Source: McConnell, _Code Complete_, 2nd ed., ch. 23.*
-
-A reference list for when you're stuck on a defect, or before claiming a fix is done. It complements the phase discipline in `SKILL.md`—reach for it when a phase stalls (no hypotheses in Phase 4, a fix that won't hold in Phase 6) rather than as a substitute for the phases.
+A reference list for when the investigation stalls. It complements the phase discipline in [`SKILL.md`](SKILL.md); apply only the techniques relevant to the failure.
 
 ## Finding the defect
 
@@ -26,27 +24,11 @@ A reference list for when you're stuck on a defect, or before claiming a fix is 
 - Set a maximum time for quick-and-dirty debugging before switching to a systematic approach.
 - Make a list of brute-force techniques, and use them.
 
-## Fixing the defect
+## Specialized probes
 
-- Understand the problem before you fix it.
-- Understand the program, not just the problem.
-- Confirm the defect diagnosis.
-- Relax.
-- Save the original source code.
-- Fix the problem, not the symptom.
-- Change the code only for good reason.
-- Make one change at a time.
-- Check your fix.
-- Add a unit test that exposes the defect.
-- Look for similar defects elsewhere.
-
-## General approach
-
-- Do you use debugging as an opportunity to learn?
-- Do you avoid the trial-and-error, superstitious approach?
-- Do you assume errors are your fault?
-- Do you use the scientific method to stabilize intermittent errors?
-- Do you use the scientific method to find defects?
-- Do you use several different techniques rather than relying on one?
-- Do you verify that the fix is correct?
-- Do you use compiler warnings, profiling, a test framework, scaffolding, and a debugger?
+- For failures involving filesystems, permissions, processes, or sockets, consider tracing OS interactions. Follow the failing system call back to the application behavior that caused it; protect traces, which may contain sensitive data, and recheck reproduction because tracing can alter timing.
+- For a large candidate set, use automated bisection or reduction only when each trial has a reliable, specific failure predicate. Detect flaky outcomes; a failing candidate may require interacting locations, so do not discard them independently without evidence.
+- Treat labels such as race, compiler, or dependency bug as hypotheses, not diagnoses. Test a discriminating mechanism; a setting that makes the symptom disappear is not proof of cause.
+- For inexplicable text or parsing differences, inspect escaped or byte-level input: Unicode whitespace, line endings, trailing characters, and the final newline.
+- For filesystem discrepancies, verify the resolved path, object type, symlink target, mount, and permissions—not just the displayed filename.
+- For recurring failures, record timestamps and time since startup or the preceding event; compare intervals with expirations, scheduled jobs, and protocol timers. Treat alignment as a hypothesis to test.
